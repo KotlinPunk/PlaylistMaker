@@ -14,8 +14,7 @@ class SearchActivity : AppCompatActivity() {
         val arrowbackButton = findViewById<ImageButton>(R.id.arrowback)
 
         arrowbackButton.setOnClickListener {
-            val arrowbackIntent = Intent(this, MainActivity::class.java)
-            startActivity(arrowbackIntent)
+            finish()
         }
     }
 }

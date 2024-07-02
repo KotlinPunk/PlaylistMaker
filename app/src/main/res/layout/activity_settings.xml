@@ -58,76 +58,36 @@
             />
     </FrameLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/sixty_four_dp">
-
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/sixteen_dp"
-            android:layout_gravity="start|center_vertical"
+            android:drawableEnd="@drawable/ic_share"
+            android:paddingHorizontal="@dimen/sixteen_dp"
+            android:paddingVertical="@dimen/twenty_dp"
             android:text="@string/share"
-            android:textSize="@dimen/sixteen_sp"
             android:textColor="@color/black"
-            android:gravity="center"
+            android:textSize="@dimen/sixteen_sp"
             />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="@dimen/sixteen_dp"
-            android:src="@drawable/ic_share"
-            android:background="@android:color/transparent"
-            />
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/sixty_four_dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/sixteen_dp"
-            android:layout_gravity="start|center_vertical"
+            android:drawableEnd="@drawable/ic_support"
+            android:paddingHorizontal="@dimen/sixteen_dp"
+            android:paddingVertical="@dimen/twenty_dp"
             android:text="@string/support"
-            android:textSize="@dimen/sixteen_sp"
             android:textColor="@color/black"
-            android:gravity="center"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="@dimen/sixteen_sp"
-            android:src="@drawable/ic_support"
-            android:background="@android:color/transparent"
+            android:textSize="@dimen/sixteen_sp"
             />
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/sixty_four_dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/sixteen_dp"
-            android:layout_gravity="start|center_vertical"
+            android:drawableEnd="@drawable/ic_arrowforward"
+            android:paddingHorizontal="@dimen/sixteen_dp"
+            android:paddingVertical="@dimen/twenty_dp"
             android:text="@string/agreement"
-            android:textSize="@dimen/sixteen_sp"
             android:textColor="@color/black"
-            android:gravity="center"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="@dimen/sixteen_dp"
-            android:src="@drawable/ic_arrowforward"
-            android:background="@android:color/transparent"
+            android:textSize="@dimen/sixteen_sp"
             />
-    </FrameLayout>
 </LinearLayout>

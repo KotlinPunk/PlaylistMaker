@@ -13,26 +13,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //val firstButton = findViewById<Button>(R.id.search)
-        //val secondButton = findViewById<Button>(R.id.media)
-        //val thirdButton = findViewById<Button>(R.id.settings)
-
-        //val buttonClickListener: View.OnClickListener = object : View.OnClickListener {
-            //override fun onClick(v: View?) {
-                //Toast.makeText(this@MainActivity, "Нажали на картинку 'Поиск'!", Toast.LENGTH_SHORT).show()
-            //}
-        //}
-
-        //firstButton.setOnClickListener(buttonClickListener)
-
-        //secondButton.setOnClickListener {
-            //Toast.makeText(this@MainActivity, "Нажали на картинку 'Медиатека'!", Toast.LENGTH_SHORT).show()
-        //}
-
-        //thirdButton.setOnClickListener {
-            //Toast.makeText(this@MainActivity, "Нажали на картинку 'Настройки'!", Toast.LENGTH_SHORT).show()
-        //}
-
         val searchButton = findViewById<Button>(R.id.search)
         val mediaLibraryButton = findViewById<Button>(R.id.media)
         val settingsButton = findViewById<Button>(R.id.settings)
