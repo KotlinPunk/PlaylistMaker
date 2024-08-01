@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/white">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,19 +14,44 @@
 
         <ImageButton
             android:id="@+id/arrowback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrowback"
-            android:background="@android:color/transparent"
-            android:layout_marginStart="16dp"/>
+            style="@style/ArrowBackImageButtonActivityMain"/>
 
         <TextView
+            android:text="@string/search"
+            style="@style/TextStyleTitleActivity"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/sixteen_dp">
+
+        <EditText
+            android:id="@+id/inputEditText"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/thirty_six_dp"
+            android:layout_weight="1"
+            android:paddingStart="@dimen/sixteen_dp"
+            android:hint="@string/input_hint"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColor="@color/black"
+            android:textColorHint="@color/hint"
+            android:backgroundTint="@color/background_hint"
+            android:background="@drawable/shape_corner_edit_text"
+            android:drawableStart="@drawable/ic_search_16"
+            android:drawableTint="@color/hint"
+            android:drawablePadding="@dimen/four_dp"
+            android:fontFamily="@font/ys_display_regular"
+            android:textFontWeight="400"/>
+
+        <ImageView
+            android:id="@+id/clearIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginHorizontal="24dp"
-            android:textSize="22sp"
-            android:text="@string/search"
-            android:textColor="@color/black"/>
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:visibility="gone"/>
     </LinearLayout>
 </LinearLayout>
