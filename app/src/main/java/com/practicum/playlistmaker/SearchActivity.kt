@@ -16,7 +16,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 
 class SearchActivity : AppCompatActivity() {
-    private var saveEditText = STRING
+    private var saveEditText = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,13 +68,12 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        saveEditText = savedInstanceState.getString(KEY, STRING)
+        saveEditText = savedInstanceState.getString(KEY, saveEditText)
         findViewById<TextView>(R.id.inputEditText).setText(saveEditText)
     }
 
     companion object {
-        const val KEY = "Key"
-        const val STRING = ""
+        private const val KEY = "Key"
     }
 }
 

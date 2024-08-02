@@ -27,7 +27,7 @@ class SettingsActivity : AppCompatActivity() {
             shareIntent.action = Intent.ACTION_SEND
             shareIntent.type="text/plain"
             shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.course_link))
-            startActivity(Intent.createChooser(shareIntent, "Поделиться:"))
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_link)))
         }
 
         supportButton.setOnClickListener {

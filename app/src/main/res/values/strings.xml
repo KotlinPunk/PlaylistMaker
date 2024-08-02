@@ -13,4 +13,6 @@
     <string name="mail_body">Спасибо разработчикам и разработчицам за крутое приложение!</string>
     <string name="link_agreement">https://yandex.ru/legal/practicum_offer/</string>
     <string name="input_hint">Поиск</string>
+    <string name="share_link">Поделиться:</string>
+    
 </resources>
