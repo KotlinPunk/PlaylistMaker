@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ButtonStyleActivityMain" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/dark_color</item>
+        <item name="android:textSize">@dimen/twenty_four_sp</item>
+        <item name="cornerRadius">@dimen/sixteen_dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/eight_dp</item>
+        <item name="iconTint">@color/dark_color</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+
+    <style name="TextStyleActivitySettingsWithIcon" parent="TextAppearance.AppCompat">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingHorizontal">@dimen/sixteen_dp</item>
+        <item name="android:paddingVertical">@dimen/twenty_dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/sixteen_sp</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:drawableTint">@color/dark_color</item>
+    </style>
+
+    <style name="BackgroundMainActivity">
+        <item name="android:background">@color/blue</item>
+    </style>
+
+    <style name="TextStyleTitleActivity" parent="TextAppearance.AppCompat">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_marginHorizontal">@dimen/twenty_four_dp</item>
+        <item name="android:textSize">@dimen/twenty_four_sp</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:textColor">@color/dark_color</item>
+    </style>
+
+    <style name="ArrowBackImageButtonActivityMain">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:src">@drawable/ic_arrowback</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:layout_marginStart">@dimen/sixteen_dp</item>
+    </style>
+
+</resources>

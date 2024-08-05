@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="four_dp">4dp</dimen>
     <dimen name="eight_dp">8dp</dimen>
+    <dimen name="twelve_dp">12dp</dimen>
     <dimen name="sixteen_dp">16dp</dimen>
     <dimen name="twenty_dp">20dp</dimen>
     <dimen name="twenty_four_dp">24dp</dimen>
+    <dimen name="thirty_six_dp">36dp</dimen>
     <dimen name="sixty_four_dp">64dp</dimen>
 
     <dimen name="sixteen_sp">16sp</dimen>

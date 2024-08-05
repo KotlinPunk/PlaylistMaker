@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/white">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,79 +14,33 @@
 
         <ImageButton
             android:id="@+id/arrowback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrowback"
-            android:background="@android:color/transparent"
-            android:layout_marginStart="@dimen/sixteen_dp"
-            />
+            style="@style/ArrowBackImageButtonActivityMain"/>
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginHorizontal="@dimen/twenty_four_dp"
-            android:textSize="@dimen/twenty_four_sp"
             android:text="@string/settings"
-            android:textColor="@color/black"
-            />
+            style="@style/TextStyleTitleActivity"/>
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/sixty_four_dp"
-        android:layout_marginTop="@dimen/twenty_four_dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/sixteen_dp"
-            android:layout_gravity="start|center_vertical"
-            android:text="@string/dark_theme"
-            android:textSize="@dimen/sixteen_sp"
-            android:textColor="@color/black"
-            android:gravity="center"
-            />
-
         <Switch
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="12dp"
-            android:checked="false"
-            />
-    </FrameLayout>
+            android:layout_marginTop="@dimen/twenty_four_dp"
+            android:text="@string/dark_theme"
+            style="@style/TextStyleActivitySettingsWithIcon"/>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/share"
             android:drawableEnd="@drawable/ic_share"
-            android:paddingHorizontal="@dimen/sixteen_dp"
-            android:paddingVertical="@dimen/twenty_dp"
             android:text="@string/share"
-            android:textColor="@color/black"
-            android:textSize="@dimen/sixteen_sp"
-            />
+            style="@style/TextStyleActivitySettingsWithIcon"/>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/support"
             android:drawableEnd="@drawable/ic_support"
-            android:paddingHorizontal="@dimen/sixteen_dp"
-            android:paddingVertical="@dimen/twenty_dp"
             android:text="@string/support"
-            android:textColor="@color/black"
-            android:textSize="@dimen/sixteen_sp"
-            />
+            style="@style/TextStyleActivitySettingsWithIcon"/>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/agreement"
             android:drawableEnd="@drawable/ic_arrowforward"
-            android:paddingHorizontal="@dimen/sixteen_dp"
-            android:paddingVertical="@dimen/twenty_dp"
             android:text="@string/agreement"
-            android:textColor="@color/black"
-            android:textSize="@dimen/sixteen_sp"
-            />
+            style="@style/TextStyleActivitySettingsWithIcon"/>
 </LinearLayout>
