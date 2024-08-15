@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="ButtonStyleActivityMain" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">0dp</item>
@@ -49,6 +50,16 @@
         <item name="android:src">@drawable/ic_arrowback</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="android:layout_marginStart">@dimen/sixteen_dp</item>
+        <item name="tint">@color/white</item>
+    </style>
+
+    <style name="TrackItemUnderNameText" parent="TextAppearance.AppCompat">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/eleven_sp</item>
+        <item name="android:fontFamily">"@font/ys_display_regular"</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textColor">@color/day_gray_and_night_white</item>
     </style>
 
 </resources>
