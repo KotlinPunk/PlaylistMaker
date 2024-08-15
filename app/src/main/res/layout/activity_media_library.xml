@@ -14,10 +14,10 @@
 
         <ImageButton
             android:id="@+id/arrowback"
-            style="@style/ArrowBackImageButtonActivityMain"/>
+            style="@style/ArrowBackImageButtonActivityMain" />
 
         <TextView
-            android:text="@string/media_library"
-            style="@style/TextStyleTitleActivity"/>
+            style="@style/TextStyleTitleActivity"
+            android:text="@string/media_library" />
     </LinearLayout>
 </LinearLayout>

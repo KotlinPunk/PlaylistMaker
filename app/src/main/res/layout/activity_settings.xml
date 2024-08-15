@@ -14,33 +14,33 @@
 
         <ImageButton
             android:id="@+id/arrowback"
-            style="@style/ArrowBackImageButtonActivityMain"/>
+            style="@style/ArrowBackImageButtonActivityMain" />
 
         <TextView
-            android:text="@string/settings"
-            style="@style/TextStyleTitleActivity"/>
+            style="@style/TextStyleTitleActivity"
+            android:text="@string/settings" />
     </LinearLayout>
 
-        <Switch
-            android:layout_marginTop="@dimen/twenty_four_dp"
-            android:text="@string/dark_theme"
-            style="@style/TextStyleActivitySettingsWithIcon"/>
+    <Switch
+        style="@style/TextStyleActivitySettingsWithIcon"
+        android:layout_marginTop="@dimen/twenty_four_dp"
+        android:text="@string/dark_theme" />
 
-        <TextView
-            android:id="@+id/share"
-            android:drawableEnd="@drawable/ic_share"
-            android:text="@string/share"
-            style="@style/TextStyleActivitySettingsWithIcon"/>
+    <TextView
+        android:id="@+id/share"
+        style="@style/TextStyleActivitySettingsWithIcon"
+        android:drawableEnd="@drawable/ic_share"
+        android:text="@string/share" />
 
-        <TextView
-            android:id="@+id/support"
-            android:drawableEnd="@drawable/ic_support"
-            android:text="@string/support"
-            style="@style/TextStyleActivitySettingsWithIcon"/>
+    <TextView
+        android:id="@+id/support"
+        style="@style/TextStyleActivitySettingsWithIcon"
+        android:drawableEnd="@drawable/ic_support"
+        android:text="@string/support" />
 
-        <TextView
-            android:id="@+id/agreement"
-            android:drawableEnd="@drawable/ic_arrowforward"
-            android:text="@string/agreement"
-            style="@style/TextStyleActivitySettingsWithIcon"/>
+    <TextView
+        android:id="@+id/agreement"
+        style="@style/TextStyleActivitySettingsWithIcon"
+        android:drawableEnd="@drawable/ic_arrowforward"
+        android:text="@string/agreement" />
 </LinearLayout>
