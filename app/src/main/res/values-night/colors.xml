@@ -8,5 +8,7 @@
     <color name="color_switch">#3772E7</color>
     <color name="hint">#1A1B22</color>
     <color name="background_hint">#FFFFFF</color>
-
+    <color name="day_gray_and_night_white">#FFFFFF</color>
+    <color name="day_black_night_white">#FFFFFF</color>
+    <color name="color_cursor">#3772E7</color>
 </resources>

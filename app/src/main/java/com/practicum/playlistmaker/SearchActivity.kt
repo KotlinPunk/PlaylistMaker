@@ -1,19 +1,18 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+
 
 class SearchActivity : AppCompatActivity() {
     private var saveEditText = ""
@@ -26,6 +25,10 @@ class SearchActivity : AppCompatActivity() {
         val inputEditText = findViewById<EditText>(R.id.inputEditText)
         val clearIcon = findViewById<ImageView>(R.id.clearIcon)
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val rvTrackList = findViewById<RecyclerView>(R.id.rvTrackListXml)
+        val trackAdapter = TrackAdapter(Track.trackList)
+
+        rvTrackList.adapter = trackAdapter
 
         arrowbackButton.setOnClickListener {
             finish()

@@ -43,6 +43,7 @@
             android:paddingStart="@dimen/twelve_dp"
             android:textColor="@color/black"
             android:textColorHint="@color/hint"
+            android:textCursorDrawable="@drawable/cursor"
             android:textFontWeight="400" />
 
         <ImageButton
@@ -56,4 +57,13 @@
             android:visibility="gone"
             app:tint="@color/hint" />
     </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTrackListXml"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sixteen_dp"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
 </LinearLayout>
