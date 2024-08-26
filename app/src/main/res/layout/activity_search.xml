@@ -38,9 +38,11 @@
             android:drawableTint="@color/hint"
             android:fontFamily="@font/ys_display_regular"
             android:hint="@string/input_hint"
+            android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1"
             android:paddingStart="@dimen/twelve_dp"
+            android:singleLine="true"
             android:textColor="@color/black"
             android:textColorHint="@color/hint"
             android:textCursorDrawable="@drawable/cursor"
@@ -57,6 +59,52 @@
             android:visibility="gone"
             app:tint="@color/hint" />
     </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/placeholderLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/placeholderErrorImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/one_hundred_dp"
+            tools:src="@drawable/error_search" />
+
+        <TextView
+            android:id="@+id/placeholderErrorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="@dimen/twenty_four_dp"
+            android:layout_marginTop="@dimen/sixteen_dp"
+            android:layout_marginBottom="@dimen/twenty_four_dp"
+            android:layout_weight="400"
+            android:fontFamily="@font/ys_display_medium"
+            android:gravity="center"
+            android:textColor="@color/day_dark_and_night_white"
+            android:textSize="@dimen/nineteen_sp"
+            tools:text="@string/nothing_found" />
+
+        <Button
+            android:id="@+id/updateQueryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="500"
+            android:backgroundTint="@color/day_dark_and_night_white"
+            android:fontFamily="@font/ys_display_medium"
+            android:text="@string/refresh"
+            android:textAllCaps="false"
+            android:textColor="@color/day_white_and_night_dark"
+            android:textSize="@dimen/fourteen_sp"
+            android:visibility="gone"
+            app:cornerRadius="@dimen/fifty_two" />
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTrackListXml"

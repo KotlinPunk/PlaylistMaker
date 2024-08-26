@@ -27,39 +27,46 @@
         android:textColor="@color/day_black_night_white"
         android:textFontWeight="400"
         android:textSize="@dimen/sixteen_dp"
-        app:layout_constraintBottom_toTopOf="@id/trackTimeXml"
+        app:layout_constraintBottom_toTopOf="@id/flowUnderTrackName"
         app:layout_constraintEnd_toStartOf="@id/arrowforward"
         app:layout_constraintStart_toEndOf="@id/artworkXml"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="Smells Like Teen Spirit" />
+        tools:text="Smells Like Teen Spirit Smells Like Teen Spirit Smells Like Teen Spirit" />
+
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flowUnderTrackName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/eight_dp"
+        android:layout_marginEnd="@dimen/eight_dp"
+        app:constraint_referenced_ids="artistNameXml,point,trackTimeXml"
+        app:flow_firstHorizontalBias="0"
+        app:flow_firstHorizontalStyle="packed"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/arrowforward"
+        app:layout_constraintStart_toEndOf="@id/artworkXml"
+        app:layout_constraintTop_toBottomOf="@id/trackNameXml" />
 
     <TextView
         android:id="@+id/artistNameXml"
         style="@style/TrackItemUnderNameText"
-        android:layout_marginStart="@dimen/eight_dp"
-        app:layout_constraintStart_toEndOf="@id/artworkXml"
-        app:layout_constraintTop_toBottomOf="@id/trackNameXml"
-        tools:text="Nirvana" />
+        android:ellipsize="marquee"
+        android:maxLines="1"
+        tools:text="NirvanaNirvanaNirvanaNirvanaNirvanaNirvanaNirvanaNirvana" />
 
     <TextView
         android:id="@+id/point"
         style="@style/TrackItemUnderNameText"
         android:drawableStart="@drawable/ic_point"
-        android:drawableTint="@color/day_gray_and_night_white"
-        app:layout_constraintStart_toEndOf="@id/artistNameXml"
-        app:layout_constraintTop_toBottomOf="@id/trackNameXml" />
+        android:drawableTint="@color/day_gray_and_night_white" />
 
     <TextView
         android:id="@+id/trackTimeXml"
         style="@style/TrackItemUnderNameText"
-        android:layout_marginEnd="@dimen/eight_dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/arrowforward"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/point"
-        app:layout_constraintTop_toBottomOf="@id/trackNameXml"
-        app:layout_constraintVertical_chainStyle="packed"
+        android:ellipsize="marquee"
+        android:maxLines="1"
         tools:text="5:01" />
 
     <ImageButton

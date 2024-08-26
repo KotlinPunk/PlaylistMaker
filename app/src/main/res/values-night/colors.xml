@@ -11,4 +11,6 @@
     <color name="day_gray_and_night_white">#FFFFFF</color>
     <color name="day_black_night_white">#FFFFFF</color>
     <color name="color_cursor">#3772E7</color>
+    <color name="day_dark_and_night_white">#FFFFFF</color>
+    <color name="day_white_and_night_dark">#1A1B22</color>
 </resources>

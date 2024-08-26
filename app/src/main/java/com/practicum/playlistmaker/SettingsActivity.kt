@@ -25,7 +25,7 @@ class SettingsActivity : AppCompatActivity() {
         shareButton.setOnClickListener {
             val shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND
-            shareIntent.type="text/plain"
+            shareIntent.type = "text/plain"
             shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.course_link))
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_link)))
         }
@@ -41,7 +41,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         agreementButton.setOnClickListener {
-            val agreementIntent =Intent(Intent.ACTION_VIEW)
+            val agreementIntent = Intent(Intent.ACTION_VIEW)
             agreementIntent.data = Uri.parse(getString(R.string.link_agreement))
             startActivity(agreementIntent)
         }
