@@ -6,9 +6,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Switch
 import android.widget.TextView
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -17,6 +20,7 @@ class SettingsActivity : AppCompatActivity() {
         val shareButton = findViewById<TextView>(R.id.share)
         val supportButton = findViewById<TextView>(R.id.support)
         val agreementButton = findViewById<TextView>(R.id.agreement)
+        val themeSwitcher = findViewById<Switch>(R.id.themeSwitcher)
 
         arrowbackButton.setOnClickListener {
             finish()
@@ -46,5 +50,10 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(agreementIntent)
         }
 
+        themeSwitcher.setChecked((applicationContext as App).setDarkTheme())
+
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+        }
     }
 }

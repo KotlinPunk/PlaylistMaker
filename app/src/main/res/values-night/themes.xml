@@ -5,9 +5,7 @@
         <item name="android:buttonStyle">@style/ButtonStyleActivityMain</item>
         <item name="android:backgroundTint">@color/dark_color</item>
 
-        <item name="android:thumbTint">@color/color_switch</item>
-        <item name="android:trackTint">@color/color_switch</item>
-        <item name="android:checked">true</item>
+
     </style>
 
     <style name="Night.Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker"/>

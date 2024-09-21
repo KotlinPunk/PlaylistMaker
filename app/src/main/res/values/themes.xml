@@ -3,9 +3,7 @@
     <style name="Base.Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:textColor">@color/white</item>
         <item name="android:buttonStyle">@style/ButtonStyleActivityMain</item>
-        <item name="android:thumbTint">@color/color_switch</item>
-        <item name="android:trackTint">@color/color_switch</item>
-        <item name="android:checked">false</item>
+
     </style>
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker"/>

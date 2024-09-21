@@ -92,18 +92,8 @@
 
         <Button
             android:id="@+id/updateQueryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="500"
-            android:backgroundTint="@color/day_dark_and_night_white"
-            android:fontFamily="@font/ys_display_medium"
-            android:text="@string/refresh"
-            android:textAllCaps="false"
-            android:textColor="@color/day_white_and_night_dark"
-            android:textSize="@dimen/fourteen_sp"
-            android:visibility="gone"
-            app:cornerRadius="@dimen/fifty_two" />
+            style="@style/ButtonStyleActivitySettings"
+            android:text="@string/refresh" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -113,5 +103,48 @@
         android:layout_marginTop="@dimen/sixteen_dp"
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/searchHistoryLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/twenty_four_dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/searchHistoryText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="@dimen/sixteen_dp"
+                android:layout_weight="500"
+                android:fontFamily="@font/ys_display_medium"
+                android:gravity="center"
+                android:paddingVertical="@dimen/sixteen_dp"
+                android:text="@string/you_search"
+                android:textColor="@color/day_dark_and_night_white"
+                android:textSize="@dimen/nineteen_sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/searchHistoryRV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/twenty_four_dp"
+                android:nestedScrollingEnabled="false"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <Button
+                android:id="@+id/searchHistoryClearButton"
+                style="@style/ButtonStyleActivitySettings"
+                android:text="@string/clear_history" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

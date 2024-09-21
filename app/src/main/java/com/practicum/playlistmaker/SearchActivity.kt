@@ -1,6 +1,8 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -15,6 +17,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
 import retrofit2.Call
 import retrofit2.Callback
@@ -22,13 +25,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-
 class SearchActivity : AppCompatActivity() {
-    companion object {
-        private const val KEY = "Key"
-        private const val itunesBaseUrl = "https://itunes.apple.com"
-    }
-
     private var saveEditText = ""
 
     private val retrofit = Retrofit.Builder()
@@ -39,7 +36,9 @@ class SearchActivity : AppCompatActivity() {
     private val itunesService = retrofit.create(TrackApi::class.java)
 
     private val trackList = ArrayList<Track>()
-    private val trackAdapter = TrackAdapter(trackList)
+    private val trackListSearchHistory = ArrayList<Track>()
+    private var trackAdapter = TrackAdapter(trackList)
+    private val trackAdapterSearchHistory = TrackAdapter(trackListSearchHistory)
 
     private lateinit var arrowbackButton: ImageButton
     private lateinit var inputEditText: EditText
@@ -50,6 +49,13 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderErrorText: TextView
     private lateinit var updateQueryButton: Button
 
+    private lateinit var searchHistoryLayout: NestedScrollView
+    private lateinit var searchHistoryText: TextView
+    private lateinit var searchHistoryRV: RecyclerView
+    private lateinit var searchHistoryClearButton: Button
+    private lateinit var sharedPrefs: SharedPreferences
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var listenerSharedPrefs: OnSharedPreferenceChangeListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +72,35 @@ class SearchActivity : AppCompatActivity() {
         placeholderErrorText = findViewById(R.id.placeholderErrorText)
         updateQueryButton = findViewById(R.id.updateQueryButton)
 
+        searchHistoryLayout = findViewById(R.id.searchHistoryLayout)
+        searchHistoryText = findViewById(R.id.searchHistoryText)
+        searchHistoryRV = findViewById(R.id.searchHistoryRV)
+        searchHistoryClearButton = findViewById(R.id.searchHistoryClearButton)
+        sharedPrefs = getSharedPreferences(SEARCH_HISTORY_SHARED_PREFS, MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPrefs)
+
         rvTrackList.adapter = trackAdapter
+        searchHistoryRV.adapter = trackAdapterSearchHistory
+
+        trackAdapter.onClickTrack = { track: Track ->
+            searchHistory.addTrackInHistoryTrackList(track)
+            trackAdapterSearchHistory.notifyDataSetChanged()
+        }
+
+        trackAdapterSearchHistory.onClickTrack = { track: Track ->
+            searchHistory.addTrackInHistoryTrackList(track)
+            trackAdapterSearchHistory.notifyDataSetChanged()
+        }
+
+        listenerSharedPrefs = OnSharedPreferenceChangeListener { sharedPrefs, key ->
+            if (key == SEARCH_HISTORY_KEY) {
+                trackListSearchHistory.clear()
+                trackListSearchHistory.addAll(searchHistory.getHistoryTrackList())
+                trackAdapterSearchHistory.notifyDataSetChanged()
+            }
+        }
+
+        sharedPrefs.registerOnSharedPreferenceChangeListener(listenerSharedPrefs)
 
         arrowbackButton.setOnClickListener {
             finish()
@@ -83,6 +117,31 @@ class SearchActivity : AppCompatActivity() {
             inputMethodManager?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
         }
 
+        inputEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                getTrack()
+            }
+            false
+        }
+
+        inputEditText.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus && inputEditText.text.isEmpty()
+                && searchHistory.getHistoryTrackList().isNotEmpty()
+            ) {
+                searchHistoryLayout.visibility = View.VISIBLE
+                trackListSearchHistory.addAll(searchHistory.getHistoryTrackList())
+                trackAdapterSearchHistory.notifyDataSetChanged()
+            } else {
+                searchHistoryLayout.visibility = View.GONE
+            }
+        }
+
+        searchHistoryClearButton.setOnClickListener {
+            searchHistoryLayout.visibility = View.GONE
+            searchHistory.clearHistoryTrackList()
+            trackAdapterSearchHistory.notifyDataSetChanged()
+        }
+
         val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 //empty
@@ -91,6 +150,10 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearIcon.visibility = clearIconVisibility(s)
                 saveEditText = s.toString()
+                if (inputEditText.hasFocus() && s?.isEmpty() == true
+                    && searchHistory.getHistoryTrackList().isNotEmpty()
+                ) searchHistoryLayout.visibility = View.VISIBLE
+                else searchHistoryLayout.visibility = View.GONE
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -98,13 +161,6 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         inputEditText.addTextChangedListener(textWatcher)
-
-        inputEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                getTrack()
-            }
-            false
-        }
     }
 
     private fun clearIconVisibility(s: CharSequence?): Int {
@@ -177,7 +233,6 @@ class SearchActivity : AppCompatActivity() {
         } else {
             placeholderLinearLayout.visibility = View.GONE
         }
-
     }
 
     private fun showVariantMessage(text: String) {
@@ -190,5 +245,11 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    companion object {
+        private const val KEY = "Key"
+        private const val itunesBaseUrl = "https://itunes.apple.com"
+        private const val SEARCH_HISTORY_SHARED_PREFS = "search_history_shared_prefs"
+        private const val SEARCH_HISTORY_KEY = "search_history_key"
+    }
 }
 

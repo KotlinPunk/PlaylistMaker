@@ -17,4 +17,6 @@
     <string name="nothing_found">Ничего не нашлось</string>
     <string name="problems_with_connection">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="refresh">Обновить</string>
+    <string name="you_search">Вы искали</string>
+    <string name="clear_history">Очистить историю</string>
 </resources>

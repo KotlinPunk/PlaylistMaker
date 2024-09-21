@@ -1,7 +1,5 @@
 package com.practicum.playlistmaker
 
-
-
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.RoundedCorner
@@ -17,6 +15,8 @@ import java.util.Locale
 
 class TrackAdapter(private val trackList: ArrayList<Track>) :
     RecyclerView.Adapter<TrackAdapter.TrackHolder>() {
+
+    var onClickTrack: ((Track) -> Unit)? = null
 
     class TrackHolder(item: View) : RecyclerView.ViewHolder(item) {
         val binding = TrackItemBinding.bind(item)
@@ -41,6 +41,9 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
 
     override fun onBindViewHolder(holder: TrackHolder, position: Int) {
         holder.bind(trackList[position])
+        holder.itemView.setOnClickListener {
+            onClickTrack?.invoke(trackList[position])
+        }
     }
 
     override fun getItemCount(): Int {

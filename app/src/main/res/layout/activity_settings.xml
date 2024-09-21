@@ -22,9 +22,12 @@
     </LinearLayout>
 
     <Switch
+        android:id="@+id/themeSwitcher"
         style="@style/TextStyleActivitySettingsWithIcon"
         android:layout_marginTop="@dimen/twenty_four_dp"
-        android:text="@string/dark_theme" />
+        android:text="@string/dark_theme"
+        android:thumbTint="@color/color_switch"
+        android:trackTint="@color/color_switch" />
 
     <TextView
         android:id="@+id/share"
