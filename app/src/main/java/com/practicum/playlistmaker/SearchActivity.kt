@@ -125,7 +125,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         inputEditText.setOnFocusChangeListener { view, hasFocus ->
-            if (hasFocus && inputEditText.text.isEmpty()
+            if (hasFocus && inputEditText.text.isNullOrEmpty()
                 && searchHistory.getHistoryTrackList().isNotEmpty()
             ) {
                 searchHistoryLayout.visibility = View.VISIBLE
@@ -150,10 +150,16 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearIcon.visibility = clearIconVisibility(s)
                 saveEditText = s.toString()
-                if (inputEditText.hasFocus() && s?.isEmpty() == true
+                if (inputEditText.hasFocus() && s?.isNullOrEmpty() == true
                     && searchHistory.getHistoryTrackList().isNotEmpty()
-                ) searchHistoryLayout.visibility = View.VISIBLE
-                else searchHistoryLayout.visibility = View.GONE
+                ) {
+                    searchHistoryLayout.visibility = View.VISIBLE
+                }
+                else {
+                    searchHistoryLayout.visibility = View.GONE
+                    trackList.clear()
+                    trackAdapter.notifyDataSetChanged()
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {

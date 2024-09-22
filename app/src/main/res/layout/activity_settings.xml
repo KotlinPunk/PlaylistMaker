@@ -21,13 +21,32 @@
             android:text="@string/settings" />
     </LinearLayout>
 
-    <Switch
-        android:id="@+id/themeSwitcher"
-        style="@style/TextStyleActivitySettingsWithIcon"
-        android:layout_marginTop="@dimen/twenty_four_dp"
-        android:text="@string/dark_theme"
-        android:thumbTint="@color/color_switch"
-        android:trackTint="@color/color_switch" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/sixty_four_dp"
+        android:layout_marginTop="@dimen/twenty_four_dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="@dimen/sixteen_dp"
+            android:fontFamily="@font/ys_display_regular"
+            android:gravity="center"
+            android:text="@string/dark_theme"
+            android:textColor="@color/day_black_night_white"
+            android:textFontWeight="400"
+            android:textSize="@dimen/sixteen_sp" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/themeSwitcher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="@dimen/sixteen_dp"
+            app:thumbTint="@color/color_switch"
+            app:trackTint="@color/color_switch_track" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/share"

@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Switch
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
@@ -20,7 +21,7 @@ class SettingsActivity : AppCompatActivity() {
         val shareButton = findViewById<TextView>(R.id.share)
         val supportButton = findViewById<TextView>(R.id.support)
         val agreementButton = findViewById<TextView>(R.id.agreement)
-        val themeSwitcher = findViewById<Switch>(R.id.themeSwitcher)
+        val themeSwitcher = findViewById<SwitchCompat>(R.id.themeSwitcher)
 
         arrowbackButton.setOnClickListener {
             finish()
