@@ -26,7 +26,7 @@
         <item name="android:textSize">@dimen/sixteen_sp</item>
         <item name="android:fontFamily">@font/ys_display_regular</item>
         <item name="android:textFontWeight">400</item>
-        <item name="android:drawableTint">@color/dark_color</item>
+        <item name="android:drawableTint">@color/light_color_ic</item>
     </style>
 
     <style name="BackgroundMainActivity">
@@ -61,6 +61,19 @@
         <item name="android:textFontWeight">400</item>
         <item name="android:textColor">@color/day_gray_and_night_white</item>
         <item name="layout_constrainedWidth">true</item>
+    </style>
+
+    <style name="ButtonStyleActivitySettings" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:backgroundTint">@color/day_dark_and_night_white</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/day_white_and_night_dark</item>
+        <item name="android:textSize">@dimen/fourteen_sp</item>
+        <item name="cornerRadius">@dimen/fifty_two</item>
     </style>
 
 </resources>

@@ -5,7 +5,9 @@
     <color name="dark_color">#1A1B22</color>
     <color name="light_color_ic">#AEAFB4</color>
     <color name="blue">#3772E7</color>
+    <color name="day_blue_and_night_dark">#1A1B22</color>
     <color name="color_switch">#3772E7</color>
+    <color name="color_switch_track">#9FBBF3</color>
     <color name="hint">#1A1B22</color>
     <color name="background_hint">#FFFFFF</color>
     <color name="day_gray_and_night_white">#FFFFFF</color>
