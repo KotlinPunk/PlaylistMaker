@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -85,11 +87,17 @@ class SearchActivity : AppCompatActivity() {
         trackAdapter.onClickTrack = { track: Track ->
             searchHistory.addTrackInHistoryTrackList(track)
             trackAdapterSearchHistory.notifyDataSetChanged()
+            val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
+            audioPlayerIntent.putExtra(TRACK_DATA, Gson().toJson(track))
+            startActivity(audioPlayerIntent)
         }
 
         trackAdapterSearchHistory.onClickTrack = { track: Track ->
             searchHistory.addTrackInHistoryTrackList(track)
             trackAdapterSearchHistory.notifyDataSetChanged()
+            val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
+            audioPlayerIntent.putExtra(TRACK_DATA, Gson().toJson(track))
+            startActivity(audioPlayerIntent)
         }
 
         listenerSharedPrefs = OnSharedPreferenceChangeListener { sharedPrefs, key ->
@@ -154,8 +162,7 @@ class SearchActivity : AppCompatActivity() {
                     && searchHistory.getHistoryTrackList().isNotEmpty()
                 ) {
                     searchHistoryLayout.visibility = View.VISIBLE
-                }
-                else {
+                } else {
                     searchHistoryLayout.visibility = View.GONE
                     trackList.clear()
                     trackAdapter.notifyDataSetChanged()
@@ -256,6 +263,6 @@ class SearchActivity : AppCompatActivity() {
         private const val itunesBaseUrl = "https://itunes.apple.com"
         private const val SEARCH_HISTORY_SHARED_PREFS = "search_history_shared_prefs"
         private const val SEARCH_HISTORY_KEY = "search_history_key"
+        private const val TRACK_DATA = "track_data"
     }
 }
-
