@@ -17,12 +17,13 @@ import com.practicum.playlistmaker.databinding.TrackItemBinding
 class AudioplayerActivity : AppCompatActivity() {
 
 
-    private lateinit var binding: ActivityAudioplayerBinding
-    private lateinit var track: Track
+    private var _binding: ActivityAudioplayerBinding? = null
+    private val binding: ActivityAudioplayerBinding  get() = requireNotNull(_binding) { "Binding wasn't initiliazed!" }
+    private var track: Track? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAudioplayerBinding.inflate(layoutInflater)
+        _binding = ActivityAudioplayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         track = Gson().fromJson(intent.getStringExtra(TRACK_DATA), Track::class.java)
@@ -38,28 +39,28 @@ class AudioplayerActivity : AppCompatActivity() {
 
     private fun setDataTrack() {
         with(binding) {
-            nameTrackData.text = track.trackName
-            singerTrackData.text = track.artistName
-            timeTrackData.text = track.getTimeTrack()
-            albumTrackData.text = track.collectionName
-            yearTrackData.text = track.getYearTrack()
-            genreTrackData.text = track.primaryGenreName
-            countryTrackData.text = track.country
+            nameTrackData.text = track?.trackName
+            singerTrackData.text = track?.artistName
+            timeTrackData.text = track?.getTimeTrack()
+            albumTrackData.text = track?.collectionName
+            yearTrackData.text = track?.getYearTrack()
+            genreTrackData.text = track?.primaryGenreName
+            countryTrackData.text = track?.country
 
-            if (track.collectionName.isNullOrEmpty()) {
+            if (track?.collectionName.isNullOrEmpty()) {
                 albumTrackData.visibility = View.GONE
                 albumTrack.visibility = View.GONE
             } else {
-                albumTrackData.text = track.collectionName
+                albumTrackData.text = track?.collectionName
             }
 
             Glide.with(this@AudioplayerActivity)
-                .load(track.getCoverArtwork())
+                .load(track?.getCoverArtwork())
                 .placeholder(R.drawable.ic_placeholder_312_x_312)
                 .transform(
                     RoundedCorners(
                         this@AudioplayerActivity.resources.getDimensionPixelOffset(
-                            R.dimen.two_dp
+                            R.dimen.eight_dp
                         )
                     )
                 )
