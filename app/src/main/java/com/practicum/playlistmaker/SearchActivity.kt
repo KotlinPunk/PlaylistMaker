@@ -6,6 +6,8 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -16,8 +18,10 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -41,6 +45,9 @@ class SearchActivity : AppCompatActivity() {
     private val trackListSearchHistory = ArrayList<Track>()
     private var trackAdapter = TrackAdapter(trackList)
     private val trackAdapterSearchHistory = TrackAdapter(trackListSearchHistory)
+    private var isClickAllowed = true
+    private val mainThreadHandler = Handler(Looper.getMainLooper())
+
 
     private lateinit var arrowbackButton: ImageButton
     private lateinit var inputEditText: EditText
@@ -50,6 +57,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderErrorImage: ImageView
     private lateinit var placeholderErrorText: TextView
     private lateinit var updateQueryButton: Button
+    private lateinit var progressBar: ProgressBar
 
     private lateinit var searchHistoryLayout: NestedScrollView
     private lateinit var searchHistoryText: TextView
@@ -73,6 +81,7 @@ class SearchActivity : AppCompatActivity() {
         placeholderErrorImage = findViewById(R.id.placeholderErrorImage)
         placeholderErrorText = findViewById(R.id.placeholderErrorText)
         updateQueryButton = findViewById(R.id.updateQueryButton)
+        progressBar = findViewById(R.id.progressBar)
 
         searchHistoryLayout = findViewById(R.id.searchHistoryLayout)
         searchHistoryText = findViewById(R.id.searchHistoryText)
@@ -85,19 +94,23 @@ class SearchActivity : AppCompatActivity() {
         searchHistoryRV.adapter = trackAdapterSearchHistory
 
         trackAdapter.onClickTrack = { track: Track ->
-            searchHistory.addTrackInHistoryTrackList(track)
-            trackAdapterSearchHistory.notifyDataSetChanged()
-            val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
-            audioPlayerIntent.putExtra(TRACK_DATA, Gson().toJson(track))
-            startActivity(audioPlayerIntent)
+            if (clickDebounce()) {
+                searchHistory.addTrackInHistoryTrackList(track)
+                trackAdapterSearchHistory.notifyDataSetChanged()
+                val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
+                audioPlayerIntent.putExtra(TRACK_DATA, Gson().toJson(track))
+                startActivity(audioPlayerIntent)
+            }
         }
 
         trackAdapterSearchHistory.onClickTrack = { track: Track ->
-            searchHistory.addTrackInHistoryTrackList(track)
-            trackAdapterSearchHistory.notifyDataSetChanged()
-            val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
-            audioPlayerIntent.putExtra(TRACK_DATA, Gson().toJson(track))
-            startActivity(audioPlayerIntent)
+            if (clickDebounce()) {
+                searchHistory.addTrackInHistoryTrackList(track)
+                trackAdapterSearchHistory.notifyDataSetChanged()
+                val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
+                audioPlayerIntent.putExtra(TRACK_DATA, Gson().toJson(track))
+                startActivity(audioPlayerIntent)
+            }
         }
 
         listenerSharedPrefs = OnSharedPreferenceChangeListener { sharedPrefs, key ->
@@ -167,6 +180,7 @@ class SearchActivity : AppCompatActivity() {
                     trackList.clear()
                     trackAdapter.notifyDataSetChanged()
                 }
+                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -197,12 +211,14 @@ class SearchActivity : AppCompatActivity() {
 
     private fun getTrack() {
         if (inputEditText.text.isNotEmpty()) {
+            progressBar.isVisible = true
             itunesService.search(inputEditText.text.toString())
                 .enqueue(object : Callback<TrackResponse> {
                     override fun onResponse(
                         call: Call<TrackResponse>,
                         response: Response<TrackResponse>
                     ) {
+                        progressBar.isVisible = false
                         if (response.code() == 200) {
                             trackList.clear()
                             if (response.body()?.results?.isNotEmpty() == true) {
@@ -223,6 +239,7 @@ class SearchActivity : AppCompatActivity() {
                     }
 
                     override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                        progressBar.isVisible = false
                         showMessage(
                             getString(R.string.problems_with_connection),
                             t.message.toString()
@@ -258,11 +275,27 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            mainThreadHandler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
+    private fun searchDebounce() {
+        mainThreadHandler.removeCallbacks({getTrack()})
+        mainThreadHandler.postDelayed({getTrack()}, SEARCH_DEBOUNCE_DELAY)
+    }
+
     companion object {
         private const val KEY = "Key"
         private const val itunesBaseUrl = "https://itunes.apple.com"
         private const val SEARCH_HISTORY_SHARED_PREFS = "search_history_shared_prefs"
         private const val SEARCH_HISTORY_KEY = "search_history_key"
         private const val TRACK_DATA = "track_data"
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }
