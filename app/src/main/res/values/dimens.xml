@@ -7,14 +7,18 @@
     <dimen name="sixteen_dp">16dp</dimen>
     <dimen name="twenty_dp">20dp</dimen>
     <dimen name="twenty_four_dp">24dp</dimen>
+    <dimen name="twenty_eight_dp">28dp</dimen>
     <dimen name="thirty_six_dp">36dp</dimen>
+    <dimen name="forty_dp">40dp</dimen>
     <dimen name="fifty_two">52dp</dimen>
     <dimen name="sixty_four_dp">64dp</dimen>
     <dimen name="one_hundred_dp">100dp</dimen>
 
     <dimen name="eleven_sp">11sp</dimen>
+    <dimen name="thirteen_sp">13sp</dimen>
     <dimen name="fourteen_sp">14sp</dimen>
     <dimen name="sixteen_sp">16sp</dimen>
     <dimen name="nineteen_sp">19sp</dimen>
+    <dimen name="twenty_two_sp">22sp</dimen>
     <dimen name="twenty_four_sp">24sp</dimen>
 </resources>

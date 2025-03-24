@@ -23,8 +23,7 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
         fun bind(track: Track) = with(binding) {
             trackNameXml.text = track.trackName
             artistNameXml.text = track.artistName
-            trackTimeXml.text =
-                SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
+            trackTimeXml.text = track.getTimeTrack()
             Glide.with(itemView)
                 .load(track.artworkUrl100)
                 .centerCrop()

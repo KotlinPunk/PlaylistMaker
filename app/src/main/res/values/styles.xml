@@ -76,4 +76,27 @@
         <item name="cornerRadius">@dimen/fifty_two</item>
     </style>
 
+    <style name="NameOfTrackData" parent="TextAppearance.AppCompat">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/thirteen_sp</item>
+        <item name="android:fontFamily">"@font/ys_display_regular"</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="layout_constrainedWidth">true</item>
+    </style>
+
+    <style name="TrackData" parent="TextAppearance.AppCompat">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:fontFamily">"@font/ys_display_regular"</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/day_dark_and_night_white</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textSize">@dimen/thirteen_sp</item>
+        <item name="layout_constrainedWidth">true</item>
+        <item name="layout_constraintHorizontal_bias">1</item>
+    </style>
+
 </resources>
