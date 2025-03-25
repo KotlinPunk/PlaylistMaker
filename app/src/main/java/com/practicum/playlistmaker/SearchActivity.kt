@@ -47,6 +47,7 @@ class SearchActivity : AppCompatActivity() {
     private val trackAdapterSearchHistory = TrackAdapter(trackListSearchHistory)
     private var isClickAllowed = true
     private val mainThreadHandler = Handler(Looper.getMainLooper())
+    private val searchRunnable = { getTrack() }
 
 
     private lateinit var arrowbackButton: ImageButton
@@ -98,7 +99,7 @@ class SearchActivity : AppCompatActivity() {
                 searchHistory.addTrackInHistoryTrackList(track)
                 trackAdapterSearchHistory.notifyDataSetChanged()
                 val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
-                audioPlayerIntent.putExtra(TRACK_DATA, Gson().toJson(track))
+                audioPlayerIntent.putExtra(TRACK_DATA, track)
                 startActivity(audioPlayerIntent)
             }
         }
@@ -108,7 +109,7 @@ class SearchActivity : AppCompatActivity() {
                 searchHistory.addTrackInHistoryTrackList(track)
                 trackAdapterSearchHistory.notifyDataSetChanged()
                 val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
-                audioPlayerIntent.putExtra(TRACK_DATA, Gson().toJson(track))
+                audioPlayerIntent.putExtra(TRACK_DATA, track)
                 startActivity(audioPlayerIntent)
             }
         }
@@ -285,8 +286,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun searchDebounce() {
-        mainThreadHandler.removeCallbacks({getTrack()})
-        mainThreadHandler.postDelayed({getTrack()}, SEARCH_DEBOUNCE_DELAY)
+        mainThreadHandler.removeCallbacks(searchRunnable)
+        mainThreadHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
     companion object {
