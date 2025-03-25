@@ -175,9 +175,10 @@ class SearchActivity : AppCompatActivity() {
                 if (inputEditText.hasFocus() && s?.isNullOrEmpty() == true
                     && searchHistory.getHistoryTrackList().isNotEmpty()
                 ) {
-                    searchHistoryLayout.visibility = View.VISIBLE
+                    searchHistoryLayout.isVisible = true
+                    hideAll()
                 } else {
-                    searchHistoryLayout.visibility = View.GONE
+                    searchHistoryLayout.isVisible = false
                     trackList.clear()
                     trackAdapter.notifyDataSetChanged()
                 }
@@ -212,19 +213,19 @@ class SearchActivity : AppCompatActivity() {
 
     private fun getTrack() {
         if (inputEditText.text.isNotEmpty()) {
-            progressBar.isVisible = true
+            showLoadingState()
             itunesService.search(inputEditText.text.toString())
                 .enqueue(object : Callback<TrackResponse> {
                     override fun onResponse(
                         call: Call<TrackResponse>,
                         response: Response<TrackResponse>
                     ) {
-                        progressBar.isVisible = false
                         if (response.code() == 200) {
                             trackList.clear()
                             if (response.body()?.results?.isNotEmpty() == true) {
                                 trackList.addAll(response.body()?.results!!)
                                 trackAdapter.notifyDataSetChanged()
+                                showTrackList()
                             }
                             if (trackList.isEmpty()) {
                                 showMessage(getString(R.string.nothing_found), "")
@@ -240,7 +241,6 @@ class SearchActivity : AppCompatActivity() {
                     }
 
                     override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                        progressBar.isVisible = false
                         showMessage(
                             getString(R.string.problems_with_connection),
                             t.message.toString()
@@ -248,12 +248,36 @@ class SearchActivity : AppCompatActivity() {
                     }
 
                 })
+        } else {
+            trackList.clear()
+            trackAdapter.notifyDataSetChanged()
+            hideAll()
         }
+    }
+
+    private fun showLoadingState() { //отображение состояния загрузки
+        progressBar.isVisible = true
+        placeholderLinearLayout.isVisible = false
+        rvTrackList.isVisible = false
+    }
+
+    private fun showTrackList() { //отображение трек листа
+        progressBar.isVisible = false
+        placeholderLinearLayout.isVisible = false
+        rvTrackList.isVisible = true
+    }
+
+    private fun hideAll() { //всё скрыто
+        progressBar.isVisible = false
+        placeholderLinearLayout.isVisible = false
+        rvTrackList.isVisible = false
     }
 
     private fun showMessage(text: String, additionalMessage: String) {
         if (text.isNotEmpty()) {
-            placeholderLinearLayout.visibility = View.VISIBLE
+            progressBar.isVisible = false
+            placeholderLinearLayout.isVisible = true
+            rvTrackList.isVisible = false
             trackList.clear()
             trackAdapter.notifyDataSetChanged()
             placeholderErrorText.text = text
@@ -262,17 +286,17 @@ class SearchActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG).show()
             }
         } else {
-            placeholderLinearLayout.visibility = View.GONE
+            placeholderLinearLayout.isVisible = false
         }
     }
 
     private fun showVariantMessage(text: String) {
         if (text == getString(R.string.nothing_found)) {
             placeholderErrorImage.setImageResource(R.drawable.error_search)
-            updateQueryButton.visibility = View.GONE
+            updateQueryButton.isVisible = false
         } else {
             placeholderErrorImage.setImageResource(R.drawable.error_internet)
-            updateQueryButton.visibility = View.VISIBLE
+            updateQueryButton.isVisible = true
         }
     }
 
