@@ -6,6 +6,8 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -16,8 +18,10 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -41,6 +45,10 @@ class SearchActivity : AppCompatActivity() {
     private val trackListSearchHistory = ArrayList<Track>()
     private var trackAdapter = TrackAdapter(trackList)
     private val trackAdapterSearchHistory = TrackAdapter(trackListSearchHistory)
+    private var isClickAllowed = true
+    private val mainThreadHandler = Handler(Looper.getMainLooper())
+    private val searchRunnable = { getTrack() }
+
 
     private lateinit var arrowbackButton: ImageButton
     private lateinit var inputEditText: EditText
@@ -50,6 +58,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderErrorImage: ImageView
     private lateinit var placeholderErrorText: TextView
     private lateinit var updateQueryButton: Button
+    private lateinit var progressBar: ProgressBar
 
     private lateinit var searchHistoryLayout: NestedScrollView
     private lateinit var searchHistoryText: TextView
@@ -73,6 +82,7 @@ class SearchActivity : AppCompatActivity() {
         placeholderErrorImage = findViewById(R.id.placeholderErrorImage)
         placeholderErrorText = findViewById(R.id.placeholderErrorText)
         updateQueryButton = findViewById(R.id.updateQueryButton)
+        progressBar = findViewById(R.id.progressBar)
 
         searchHistoryLayout = findViewById(R.id.searchHistoryLayout)
         searchHistoryText = findViewById(R.id.searchHistoryText)
@@ -85,19 +95,23 @@ class SearchActivity : AppCompatActivity() {
         searchHistoryRV.adapter = trackAdapterSearchHistory
 
         trackAdapter.onClickTrack = { track: Track ->
-            searchHistory.addTrackInHistoryTrackList(track)
-            trackAdapterSearchHistory.notifyDataSetChanged()
-            val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
-            audioPlayerIntent.putExtra(TRACK_DATA, Gson().toJson(track))
-            startActivity(audioPlayerIntent)
+            if (clickDebounce()) {
+                searchHistory.addTrackInHistoryTrackList(track)
+                trackAdapterSearchHistory.notifyDataSetChanged()
+                val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
+                audioPlayerIntent.putExtra(TRACK_DATA, track)
+                startActivity(audioPlayerIntent)
+            }
         }
 
         trackAdapterSearchHistory.onClickTrack = { track: Track ->
-            searchHistory.addTrackInHistoryTrackList(track)
-            trackAdapterSearchHistory.notifyDataSetChanged()
-            val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
-            audioPlayerIntent.putExtra(TRACK_DATA, Gson().toJson(track))
-            startActivity(audioPlayerIntent)
+            if (clickDebounce()) {
+                searchHistory.addTrackInHistoryTrackList(track)
+                trackAdapterSearchHistory.notifyDataSetChanged()
+                val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
+                audioPlayerIntent.putExtra(TRACK_DATA, track)
+                startActivity(audioPlayerIntent)
+            }
         }
 
         listenerSharedPrefs = OnSharedPreferenceChangeListener { sharedPrefs, key ->
@@ -161,12 +175,14 @@ class SearchActivity : AppCompatActivity() {
                 if (inputEditText.hasFocus() && s?.isNullOrEmpty() == true
                     && searchHistory.getHistoryTrackList().isNotEmpty()
                 ) {
-                    searchHistoryLayout.visibility = View.VISIBLE
+                    searchHistoryLayout.isVisible = true
+                    hideAll()
                 } else {
-                    searchHistoryLayout.visibility = View.GONE
+                    searchHistoryLayout.isVisible = false
                     trackList.clear()
                     trackAdapter.notifyDataSetChanged()
                 }
+                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -197,6 +213,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun getTrack() {
         if (inputEditText.text.isNotEmpty()) {
+            showLoadingState()
             itunesService.search(inputEditText.text.toString())
                 .enqueue(object : Callback<TrackResponse> {
                     override fun onResponse(
@@ -208,6 +225,7 @@ class SearchActivity : AppCompatActivity() {
                             if (response.body()?.results?.isNotEmpty() == true) {
                                 trackList.addAll(response.body()?.results!!)
                                 trackAdapter.notifyDataSetChanged()
+                                showTrackList()
                             }
                             if (trackList.isEmpty()) {
                                 showMessage(getString(R.string.nothing_found), "")
@@ -230,12 +248,36 @@ class SearchActivity : AppCompatActivity() {
                     }
 
                 })
+        } else {
+            trackList.clear()
+            trackAdapter.notifyDataSetChanged()
+            hideAll()
         }
+    }
+
+    private fun showLoadingState() { //отображение состояния загрузки
+        progressBar.isVisible = true
+        placeholderLinearLayout.isVisible = false
+        rvTrackList.isVisible = false
+    }
+
+    private fun showTrackList() { //отображение трек листа
+        progressBar.isVisible = false
+        placeholderLinearLayout.isVisible = false
+        rvTrackList.isVisible = true
+    }
+
+    private fun hideAll() { //всё скрыто
+        progressBar.isVisible = false
+        placeholderLinearLayout.isVisible = false
+        rvTrackList.isVisible = false
     }
 
     private fun showMessage(text: String, additionalMessage: String) {
         if (text.isNotEmpty()) {
-            placeholderLinearLayout.visibility = View.VISIBLE
+            progressBar.isVisible = false
+            placeholderLinearLayout.isVisible = true
+            rvTrackList.isVisible = false
             trackList.clear()
             trackAdapter.notifyDataSetChanged()
             placeholderErrorText.text = text
@@ -244,18 +286,32 @@ class SearchActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG).show()
             }
         } else {
-            placeholderLinearLayout.visibility = View.GONE
+            placeholderLinearLayout.isVisible = false
         }
     }
 
     private fun showVariantMessage(text: String) {
         if (text == getString(R.string.nothing_found)) {
             placeholderErrorImage.setImageResource(R.drawable.error_search)
-            updateQueryButton.visibility = View.GONE
+            updateQueryButton.isVisible = false
         } else {
             placeholderErrorImage.setImageResource(R.drawable.error_internet)
-            updateQueryButton.visibility = View.VISIBLE
+            updateQueryButton.isVisible = true
         }
+    }
+
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            mainThreadHandler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
+    private fun searchDebounce() {
+        mainThreadHandler.removeCallbacks(searchRunnable)
+        mainThreadHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
     companion object {
@@ -264,5 +320,7 @@ class SearchActivity : AppCompatActivity() {
         private const val SEARCH_HISTORY_SHARED_PREFS = "search_history_shared_prefs"
         private const val SEARCH_HISTORY_KEY = "search_history_key"
         private const val TRACK_DATA = "track_data"
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }
