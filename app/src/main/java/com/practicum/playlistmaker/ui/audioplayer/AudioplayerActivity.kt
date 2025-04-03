@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.audioplayer
 
 import android.icu.text.SimpleDateFormat
 import android.media.MediaPlayer
@@ -7,17 +7,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.widget.ImageButton
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.google.gson.Gson
+import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
-import com.practicum.playlistmaker.databinding.TrackItemBinding
+import com.practicum.playlistmaker.domain.api.intr.MediaPlayerInteractor
 import java.util.Locale
 
 class AudioplayerActivity : AppCompatActivity() {
@@ -25,11 +22,10 @@ class AudioplayerActivity : AppCompatActivity() {
     private var _binding: ActivityAudioplayerBinding? = null
     private val binding: ActivityAudioplayerBinding get() = requireNotNull(_binding) { "Binding wasn't initiliazed!" }
     private var track: Track? = null
-    private var mediaPlayer = MediaPlayer()
-    private var playerState = STATE_DEFAULT
-    private val mainThreadHandler = Handler(Looper.getMainLooper())
-    private var updateTimeRunnable: Runnable? = null
-    private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
+    private val creator: Creator by lazy { Creator(this) }
+    private val mediaPlayerInteractor: MediaPlayerInteractor by lazy {
+        creator.mediaPlayerInteractor
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,14 +39,25 @@ class AudioplayerActivity : AppCompatActivity() {
             intent.getParcelableExtra(TRACK_DATA) as? Track
         }
 
-        preparePlayer()
+        mediaPlayerInteractor.preparePlayerIntr(
+            track?.previewUrl,
+            onPrepared = {
+                binding.playTrack.isEnabled = true
+            },
+            onCompletion = {
+                binding.timePlayTrack.text = BY_ZEROS
+                binding.playTrack.setImageResource(R.drawable.ic_play_track_button)
+            },
+            onTimeUpdate = { time ->
+                binding.timePlayTrack.text = time
+            }
+        )
+
         setDataTrack()
 
         binding.playTrack.setOnClickListener {
             playbackControl()
         }
-
-        updateTimeRunnable = getUpdateTimeTrack()
 
         binding.arrowback.setOnClickListener {
             finish()
@@ -59,74 +66,26 @@ class AudioplayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        mediaPlayerInteractor.pausePlayerIntr()
     }
 
     override fun onStop() {
         super.onStop()
-        pausePlayer()
+        mediaPlayerInteractor.pausePlayerIntr()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
-        updateTimeRunnable?.let(mainThreadHandler::removeCallbacks)
-        updateTimeRunnable = null
-    }
-
-    private fun preparePlayer() {
-        mediaPlayer.setDataSource(track?.previewUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            binding.playTrack.isEnabled = true
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            playerState = STATE_PREPARED
-            binding.timePlayTrack.text = BY_ZEROS
-            binding.playTrack.setImageResource(R.drawable.ic_play_track_button)
-            updateTimeRunnable?.let(mainThreadHandler::removeCallbacks)
-        }
-    }
-
-    private fun startPlayer() {
-        mediaPlayer.start()
-        binding.playTrack.setImageResource(R.drawable.ic_pause_track_button)
-        playerState = STATE_PLAYING
-        mainThreadHandler.post(updateTimeRunnable!!)
-    }
-
-    private fun pausePlayer() {
-        mediaPlayer.pause()
-        binding.playTrack.setImageResource(R.drawable.ic_play_track_button)
-        playerState = STATE_PAUSED
-        updateTimeRunnable?.let(mainThreadHandler::removeCallbacks)
+        mediaPlayerInteractor.releasePlayerIntr()
     }
 
     private fun playbackControl() {
-        when (playerState) {
-            STATE_PLAYING -> {
-                pausePlayer()
-            }
-
-            STATE_PAUSED, STATE_PREPARED -> {
-                startPlayer()
-            }
-
-            STATE_DEFAULT -> {
-                //empty
-            }
-        }
-    }
-
-    private fun getUpdateTimeTrack(): Runnable {
-        return object : Runnable {
-            override fun run() {
-                if (playerState == STATE_PLAYING) {
-                    binding.timePlayTrack.text = dateFormat.format(mediaPlayer.currentPosition)
-                    mainThreadHandler.postDelayed(this, UPDATE_TIMER)
-                }
-            }
+        if (mediaPlayerInteractor.isPlayingPlayerIntr()) {
+            mediaPlayerInteractor.pausePlayerIntr()
+            binding.playTrack.setImageResource(R.drawable.ic_play_track_button)
+        } else {
+            mediaPlayerInteractor.startPlayerIntr()
+            binding.playTrack.setImageResource(R.drawable.ic_pause_track_button)
         }
     }
 
@@ -164,11 +123,5 @@ class AudioplayerActivity : AppCompatActivity() {
     companion object {
         private const val TRACK_DATA = "track_data"
         private const val BY_ZEROS = "0:00"
-        private const val UPDATE_TIMER = 500L
-
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
     }
 }

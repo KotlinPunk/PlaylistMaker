@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.search
 
 import android.content.Context
 import android.content.Intent
@@ -24,7 +24,16 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
+import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.data.impl.storage.SearchHistoryImpl
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.data.dto.TrackResponseDto
+import com.practicum.playlistmaker.data.network.TrackApi
+import com.practicum.playlistmaker.domain.api.intr.SearchHistoryInteractor
+import com.practicum.playlistmaker.domain.api.intr.SearchTracksInteractor
+import com.practicum.playlistmaker.presentation.TrackAdapter
+import com.practicum.playlistmaker.ui.audioplayer.AudioplayerActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -34,12 +43,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 class SearchActivity : AppCompatActivity() {
     private var saveEditText = ""
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(itunesBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val itunesService = retrofit.create(TrackApi::class.java)
+    private val creator: Creator by lazy { Creator(this) }
+    private val searchTracksInteractor: SearchTracksInteractor by lazy {
+        creator.searchTracksInteractor
+    }
+    private val historyInteractor: SearchHistoryInteractor by lazy {
+        creator.searchHistoryInteractor
+    }
 
     private val trackList = ArrayList<Track>()
     private val trackListSearchHistory = ArrayList<Track>()
@@ -65,7 +75,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchHistoryRV: RecyclerView
     private lateinit var searchHistoryClearButton: Button
     private lateinit var sharedPrefs: SharedPreferences
-    private lateinit var searchHistory: SearchHistory
+    private lateinit var searchHistory: SearchHistoryImpl
     private lateinit var listenerSharedPrefs: OnSharedPreferenceChangeListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,14 +99,14 @@ class SearchActivity : AppCompatActivity() {
         searchHistoryRV = findViewById(R.id.searchHistoryRV)
         searchHistoryClearButton = findViewById(R.id.searchHistoryClearButton)
         sharedPrefs = getSharedPreferences(SEARCH_HISTORY_SHARED_PREFS, MODE_PRIVATE)
-        searchHistory = SearchHistory(sharedPrefs)
+        searchHistory = SearchHistoryImpl(sharedPrefs)
 
         rvTrackList.adapter = trackAdapter
         searchHistoryRV.adapter = trackAdapterSearchHistory
 
         trackAdapter.onClickTrack = { track: Track ->
             if (clickDebounce()) {
-                searchHistory.addTrackInHistoryTrackList(track)
+                historyInteractor.addTrackToHistoryIntr(track)
                 trackAdapterSearchHistory.notifyDataSetChanged()
                 val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
                 audioPlayerIntent.putExtra(TRACK_DATA, track)
@@ -106,7 +116,7 @@ class SearchActivity : AppCompatActivity() {
 
         trackAdapterSearchHistory.onClickTrack = { track: Track ->
             if (clickDebounce()) {
-                searchHistory.addTrackInHistoryTrackList(track)
+                historyInteractor.addTrackToHistoryIntr(track)
                 trackAdapterSearchHistory.notifyDataSetChanged()
                 val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
                 audioPlayerIntent.putExtra(TRACK_DATA, track)
@@ -117,7 +127,7 @@ class SearchActivity : AppCompatActivity() {
         listenerSharedPrefs = OnSharedPreferenceChangeListener { sharedPrefs, key ->
             if (key == SEARCH_HISTORY_KEY) {
                 trackListSearchHistory.clear()
-                trackListSearchHistory.addAll(searchHistory.getHistoryTrackList())
+                trackListSearchHistory.addAll(historyInteractor.getTrackHistoryIntr())
                 trackAdapterSearchHistory.notifyDataSetChanged()
             }
         }
@@ -148,19 +158,19 @@ class SearchActivity : AppCompatActivity() {
 
         inputEditText.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus && inputEditText.text.isNullOrEmpty()
-                && searchHistory.getHistoryTrackList().isNotEmpty()
+                && historyInteractor.getTrackHistoryIntr().isNotEmpty()
             ) {
-                searchHistoryLayout.visibility = View.VISIBLE
-                trackListSearchHistory.addAll(searchHistory.getHistoryTrackList())
+                searchHistoryLayout.isVisible = true
+                trackListSearchHistory.addAll(historyInteractor.getTrackHistoryIntr())
                 trackAdapterSearchHistory.notifyDataSetChanged()
             } else {
-                searchHistoryLayout.visibility = View.GONE
+                searchHistoryLayout.isVisible = false
             }
         }
 
         searchHistoryClearButton.setOnClickListener {
-            searchHistoryLayout.visibility = View.GONE
-            searchHistory.clearHistoryTrackList()
+            searchHistoryLayout.isVisible = true
+            historyInteractor.clearTrackHistoryIntr()
             trackAdapterSearchHistory.notifyDataSetChanged()
         }
 
@@ -173,7 +183,7 @@ class SearchActivity : AppCompatActivity() {
                 clearIcon.visibility = clearIconVisibility(s)
                 saveEditText = s.toString()
                 if (inputEditText.hasFocus() && s?.isNullOrEmpty() == true
-                    && searchHistory.getHistoryTrackList().isNotEmpty()
+                    && historyInteractor.getTrackHistoryIntr().isNotEmpty()
                 ) {
                     searchHistoryLayout.isVisible = true
                     hideAll()
@@ -211,42 +221,36 @@ class SearchActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.inputEditText).setText(saveEditText)
     }
 
+
     private fun getTrack() {
         if (inputEditText.text.isNotEmpty()) {
             showLoadingState()
-            itunesService.search(inputEditText.text.toString())
-                .enqueue(object : Callback<TrackResponse> {
-                    override fun onResponse(
-                        call: Call<TrackResponse>,
-                        response: Response<TrackResponse>
-                    ) {
-                        if (response.code() == 200) {
-                            trackList.clear()
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                trackList.addAll(response.body()?.results!!)
-                                trackAdapter.notifyDataSetChanged()
-                                showTrackList()
+            searchTracksInteractor.searchTracksIntr(
+                inputEditText.text.toString(),
+                object : SearchTracksInteractor.TracksConsumer {
+                    override fun consume(tracks: List<Track>?) {
+                        mainThreadHandler.post {
+                            when {
+                                tracks == null -> {
+                                    showMessage(
+                                        getString(R.string.problems_with_connection),
+                                        ""
+                                    )
+                                }
+
+                                tracks.isEmpty() -> {
+                                    showMessage(getString(R.string.nothing_found), "")
+                                }
+
+                                else -> {
+                                    trackList.clear()
+                                    trackList.addAll(tracks)
+                                    trackAdapter.notifyDataSetChanged()
+                                    showTrackList()
+                                }
                             }
-                            if (trackList.isEmpty()) {
-                                showMessage(getString(R.string.nothing_found), "")
-                            } else {
-                                showMessage("", "")
-                            }
-                        } else {
-                            showMessage(
-                                getString(R.string.problems_with_connection),
-                                response.code().toString()
-                            )
                         }
                     }
-
-                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                        showMessage(
-                            getString(R.string.problems_with_connection),
-                            t.message.toString()
-                        )
-                    }
-
                 })
         } else {
             trackList.clear()

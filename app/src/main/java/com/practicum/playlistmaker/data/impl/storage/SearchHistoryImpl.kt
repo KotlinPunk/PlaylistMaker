@@ -1,14 +1,15 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.data.impl.storage
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.practicum.playlistmaker.data.dto.TrackDto
 
-class SearchHistory(private val sharedPrefs: SharedPreferences) {
+class SearchHistoryImpl(private val sharedPrefs: SharedPreferences) {
 
     private val trackListHistory = getHistoryTrackList().toMutableList()
 
-    fun addTrackInHistoryTrackList(track: Track) {
+    fun addTrackInHistoryTrackList(track: TrackDto) {
         val trackIdentificator = trackListHistory.indexOfFirst { it.trackId == track.trackId }
         if (trackIdentificator != -1) {
             trackListHistory.removeAt(trackIdentificator)
@@ -22,13 +23,13 @@ class SearchHistory(private val sharedPrefs: SharedPreferences) {
         saveTrackInHistoryTrackList(trackListHistory)
     }
 
-    fun saveTrackInHistoryTrackList(trackList: List<Track>) {
+    fun saveTrackInHistoryTrackList(trackList: List<TrackDto>) {
         sharedPrefs.edit()
             .putString(SEARCH_HISTORY_KEY, createJsonFromTrackList(trackList))
             .apply()
     }
 
-    fun getHistoryTrackList(): List<Track> {
+    fun getHistoryTrackList(): List<TrackDto> {
         val track = sharedPrefs.getString(SEARCH_HISTORY_KEY, null)
         return track?.let { createTrackListFromJson(track) } ?: emptyList()
     }
@@ -40,12 +41,12 @@ class SearchHistory(private val sharedPrefs: SharedPreferences) {
             .apply()
     }
 
-    private fun createJsonFromTrackList(trackList: List<Track>): String { //передаём
+    private fun createJsonFromTrackList(trackList: List<TrackDto>): String { //передаём
         return Gson().toJson(trackList)
     }
 
-    private fun createTrackListFromJson(json: String): List<Track> { //получаем
-        val type = object : TypeToken<List<Track>>() {}.type
+    private fun createTrackListFromJson(json: String): List<TrackDto> { //получаем
+        val type = object : TypeToken<List<TrackDto>>() {}.type
         return Gson().fromJson(json, type)
     }
 
