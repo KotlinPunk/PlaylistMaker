@@ -5,11 +5,6 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 
 class App : Application() {
-    companion object {
-        const val APP_PREFERENCES = "practicum_example_app_preferences"
-        const val THEME_KEY = "key_for_theme"
-    }
-
     var darkTheme = false
     var sharedPrefs: SharedPreferences? = null
 
@@ -38,5 +33,10 @@ class App : Application() {
         sharedPrefs?.edit()
             ?.putBoolean(THEME_KEY, darkTheme)
             ?.apply()
+    }
+
+    companion object {
+        const val APP_PREFERENCES = "practicum_example_app_preferences"
+        const val THEME_KEY = "key_for_theme"
     }
 }
