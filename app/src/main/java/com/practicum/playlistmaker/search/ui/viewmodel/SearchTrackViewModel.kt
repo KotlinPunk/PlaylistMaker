@@ -50,6 +50,12 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
     init {
         loadSearchHistory() // как только создаём viewvodel сразу загружаем историю поиска
     }
+
+    // функция для загрузки истории поиска
+    fun loadSearchHistory() {
+        searchHistoryLiveData.value = historyInteractor.getTrackHistoryIntr()
+    }
+
     fun searchDebounce(changedText: String) {
         if (latestSearchText == changedText) {
             return
@@ -75,11 +81,6 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
         } else {
             renderState(TracksState.EmptyAll)
         }
-    }
-
-    // функция для загрузки истории поиска
-    fun loadSearchHistory() {
-        searchHistoryLiveData.value = historyInteractor.getTrackHistoryIntr() ?: emptyList()
     }
 
     // функция добавления в историю поиска

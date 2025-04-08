@@ -8,20 +8,25 @@ import com.practicum.playlistmaker.sharing.domain.models.EmailData
 
 class SharingRepositoryImpl(private val context: Context, private val navigator: Navigator) :
     SharingRepository {
+
     override fun shareAppRepo() {
         navigator.getShare(getShareAppLink())
     }
 
     override fun openTermsRepo() {
-        navigator.getSupport(getSupportEmailData())
+        navigator.getAgreement(getTermsLink())
     }
 
     override fun openSupportRepo() {
-        navigator.getAgreement(getTermsLink())
+        navigator.getSupport(getSupportEmailData())
     }
 
     private fun getShareAppLink(): String {
         return context.getString(R.string.course_link)
+    }
+
+    private fun getTermsLink(): String {
+        return context.getString(R.string.link_agreement)
     }
 
     private fun getSupportEmailData(): EmailData {
@@ -31,10 +36,4 @@ class SharingRepositoryImpl(private val context: Context, private val navigator:
             mailBody = context.getString((R.string.mail_body))
         )
     }
-
-    private fun getTermsLink(): String {
-        return context.getString(R.string.link_agreement)
-    }
-
-
 }

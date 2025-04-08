@@ -110,7 +110,7 @@ class AudioplayerActivity : ComponentActivity() {
                 albumTrackData.text = track.collectionName
             }
 
-            Glide.with(this as Context)
+            Glide.with(applicationContext)
                 .load(track.getCoverArtwork())
                 .placeholder(R.drawable.ic_placeholder_312_x_312)
                 .transform(

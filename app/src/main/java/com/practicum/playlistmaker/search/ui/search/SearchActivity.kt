@@ -147,7 +147,7 @@ class SearchActivity : ComponentActivity() {
             false
         }
 
-        inputEditText.setOnFocusChangeListener { view, hasFocus ->
+        inputEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && inputEditText.text.isNullOrEmpty()) {
                 searchHistoryLayout.isVisible = trackListSearchHistory.isNotEmpty()
             } else {
