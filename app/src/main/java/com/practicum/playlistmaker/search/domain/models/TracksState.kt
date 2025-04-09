@@ -18,5 +18,5 @@ sealed interface TracksState {
         val message: String
     ) : TracksState
 
-    data object EmptyInput : TracksState
+    data object EmptyInputShowHistory : TracksState
 }

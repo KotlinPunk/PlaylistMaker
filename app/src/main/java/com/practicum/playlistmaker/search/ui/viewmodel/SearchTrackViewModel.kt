@@ -31,10 +31,9 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
     private val trackList = ArrayList<Track>()
     private val mainThreadHandler = Handler(Looper.getMainLooper())
     private var latestSearchText: String? = null
-    private var lastSearchText: String? = null
 
-    private val searchRunnable = {
-        val newSearchText = lastSearchText ?: ""
+    private val searchRunnable = Runnable {
+        val newSearchText = latestSearchText ?: ""
         getTrack(newSearchText)
     }
 
@@ -61,7 +60,6 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
             return
         }
         this.latestSearchText = changedText
-        this.lastSearchText = changedText
         mainThreadHandler.removeCallbacks(searchRunnable)
         mainThreadHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
@@ -74,20 +72,21 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
         stateLiveData.postValue(state)
     }
 
-    private fun searchHistoryOrAllHide() {
+    fun searchHistoryOrAllHide() {
         val historyList = historyInteractor.getTrackHistoryIntr()
-        if (historyList.isEmpty()) {
-            renderState(TracksState.EmptyInput)
+        if (historyList.isNotEmpty()) {
+            renderState(TracksState.EmptyInputShowHistory)
         } else {
             renderState(TracksState.EmptyAll)
         }
     }
 
     // функция добавления в историю поиска
-    fun addTrackToHistory(track: Track){
+    fun addTrackToHistory(track: Track) {
         historyInteractor.addTrackToHistoryIntr(track)
         loadSearchHistory() // как добавили, сразу обновили LiveData
     }
+
     //функция очистки истории поиска
     fun clearSearchHistory() {
         historyInteractor.clearTrackHistoryIntr()
@@ -99,10 +98,8 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     fun getTrack(newSearchText: String) {
-        if (newSearchText.isNotEmpty()) {
-            renderState(
-                TracksState.Loading
-            )
+        if (newSearchText.trim().isNotEmpty()) {
+            renderState(TracksState.Loading)
             searchTracksInteractor.searchTracksIntr(
                 newSearchText,
                 object : SearchTracksInteractor.TracksConsumer {
@@ -122,7 +119,9 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
                                         )
                                     )
                                 )
-                                toastState.value = ToastState.Show(errorMessage)
+                                mainThreadHandler.post {
+                                    toastState.value = ToastState.Show(errorMessage)
+                                }
                             }
 
                             trackList.isEmpty() -> {
@@ -146,6 +145,9 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
                     }
                 })
         } else {
+            /*val showHistory = historyInteractor.getTrackHistoryIntr().isNotEmpty()
+            renderState(if (showHistory) TracksState.EmptyInputShowHistory else TracksState.EmptyAll)*/
+            /*renderState(TracksState.EmptyAll)*/
             searchHistoryOrAllHide()
         }
     }

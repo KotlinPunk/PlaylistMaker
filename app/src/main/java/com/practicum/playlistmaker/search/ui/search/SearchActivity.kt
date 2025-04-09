@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -18,7 +19,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
@@ -30,7 +31,7 @@ import com.practicum.playlistmaker.search.domain.models.ToastState
 import com.practicum.playlistmaker.search.domain.models.TracksState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchTrackViewModel
 
-class SearchActivity : ComponentActivity() {
+class SearchActivity : AppCompatActivity(){
     private var saveEditText = ""
 
     private val trackList = ArrayList<Track>()
@@ -138,6 +139,7 @@ class SearchActivity : ComponentActivity() {
             trackList.clear()
             trackAdapter.notifyDataSetChanged()
             inputMethodManager?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+
         }
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -149,9 +151,7 @@ class SearchActivity : ComponentActivity() {
 
         inputEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && inputEditText.text.isNullOrEmpty()) {
-                searchHistoryLayout.isVisible = trackListSearchHistory.isNotEmpty()
-            } else {
-                searchHistoryLayout.isVisible = false
+                viewModel.searchHistoryOrAllHide()
             }
         }
 
@@ -167,16 +167,33 @@ class SearchActivity : ComponentActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
                 clearIcon.visibility = clearIconVisibility(s)
-                saveEditText = s?.toString() ?: ""
+                viewModel.searchDebounce(changedText = s?.toString() ?: "")
+
+
+               /* saveEditText = s.toString()
+                if (s.isNullOrEmpty()){
+                    trackList.clear()
+                    trackAdapter.notifyDataSetChanged()
+                    viewModel.searchHistoryOrAllHide()
+                }*/
+                /*saveEditText = s?.toString() ?: ""*/
+
+
                 if (inputEditText.hasFocus() && s?.isNullOrEmpty() == true) {
-                    searchHistoryLayout.isVisible = trackListSearchHistory.isNotEmpty()
-                } else {
+                    viewModel.searchHistoryOrAllHide()
+                } /*else {
                     searchHistoryLayout.isVisible = false
                     trackList.clear()
                     trackAdapter.notifyDataSetChanged()
-                }
-                viewModel.searchDebounce(changedText = saveEditText)
+
+                    *//*viewModel.searchDebounce(changedText = saveEditText)
+                    if (s?.isEmpty() == true){
+                        viewModel.showSearchHistory()
+                    }*//*
+                }*/
+
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -184,6 +201,16 @@ class SearchActivity : ComponentActivity() {
             }
         }
         textWatcher?.let { inputEditText.addTextChangedListener(it) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val searchText = inputEditText.text.toString()
+        if (searchText.isNotEmpty()) {
+            viewModel.getTrack(searchText)
+        } else {
+            viewModel.getTrack("") // Обновляем состояние, если поле пустое
+        }
     }
 
     override fun onDestroy() {
@@ -198,6 +225,12 @@ class SearchActivity : ComponentActivity() {
             View.VISIBLE
         }
     }
+
+    /*private fun hideKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = this.currentFocus ?: View(this)
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }*/
 
     override fun onSaveInstanceState(textwatcher: Bundle) {
         super.onSaveInstanceState(textwatcher)
@@ -217,7 +250,7 @@ class SearchActivity : ComponentActivity() {
             is TracksState.Content -> showContent(state.trackL)
             is TracksState.Error -> showError(state.errorMessage)
             is TracksState.EmptyList -> showEmptyList(state.message)
-            is TracksState.EmptyInput -> showSearchHistory()
+            is TracksState.EmptyInputShowHistory -> showSearchHistory()
         }
     }
 
@@ -253,11 +286,20 @@ class SearchActivity : ComponentActivity() {
         trackList.clear()
         trackAdapter.notifyDataSetChanged()
         placeholderErrorText.text = errorMessage
-        showVariantMessage(errorMessage)
+        placeholderErrorImage.setImageResource(R.drawable.error_internet)
+        updateQueryButton.isVisible = true
     }
 
     fun showEmptyList(emptyMessage: String) {
-        showError(emptyMessage)
+        rvTrackList.isVisible = false
+        placeholderLinearLayout.isVisible = true
+        progressBar.isVisible = false
+        searchHistoryLayout.isVisible = false
+        trackList.clear()
+        trackAdapter.notifyDataSetChanged()
+        placeholderErrorText.text = emptyMessage
+        placeholderErrorImage.setImageResource(R.drawable.error_search)
+        updateQueryButton.isVisible = false
     }
 
     fun showSearchHistory() {
@@ -265,15 +307,15 @@ class SearchActivity : ComponentActivity() {
         placeholderLinearLayout.isVisible = false
         progressBar.isVisible = false
         searchHistoryLayout.isVisible = true
-        trackList.clear()
-        trackAdapter.notifyDataSetChanged()
+        /*trackList.clear()
+        trackAdapter.notifyDataSetChanged()*/
     }
 
     private fun showToast(additionalMessage: String) {
         Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG).show()
     }
 
-    private fun showVariantMessage(text: String) {
+    /*private fun showVariantMessage(text: String) {
         if (text == getString(R.string.nothing_found)) {
             placeholderErrorImage.setImageResource(R.drawable.error_search)
             updateQueryButton.isVisible = false
@@ -281,7 +323,7 @@ class SearchActivity : ComponentActivity() {
             placeholderErrorImage.setImageResource(R.drawable.error_internet)
             updateQueryButton.isVisible = true
         }
-    }
+    }*/
 
     private fun clickDebounce(): Boolean {
         val current = isClickAllowed
@@ -296,5 +338,6 @@ class SearchActivity : ComponentActivity() {
         private const val KEY = "Key"
         private const val TRACK_DATA = "track_data"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val REQUEST_CODE_PLAY_TRACK = 1 // Задаем код запроса
     }
 }

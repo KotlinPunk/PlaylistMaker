@@ -16,7 +16,7 @@ import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.domain.api.intr.MediaPlayerInteractor
 import com.practicum.playlistmaker.player.ui.viewmodel.AudioPlayerViewModel
 
-class AudioplayerActivity : ComponentActivity() {
+class AudioplayerActivity : AppCompatActivity() {
 
     private var _binding: ActivityAudioplayerBinding? = null
     private val binding: ActivityAudioplayerBinding get() = requireNotNull(_binding) { "Binding wasn't initiliazed!" }
