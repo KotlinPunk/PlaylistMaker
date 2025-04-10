@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.player.ui.player.AudioplayerActivity
+import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.search.domain.models.ToastState
 import com.practicum.playlistmaker.search.domain.models.TracksState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchTrackViewModel
@@ -110,8 +111,20 @@ class SearchActivity : AppCompatActivity(){
             if (clickDebounce()) {
                 viewModel.addTrackToHistory(track)
                 trackAdapterSearchHistory.notifyDataSetChanged()
+                val trackData = TrackData(
+                    track.trackName,
+                    track.artistName,
+                    track.trackTimeMillis,
+                    track.artworkUrl100,
+                    track.trackId,
+                    track.collectionName,
+                    track.releaseDate,
+                    track.primaryGenreName,
+                    track.country,
+                    track.previewUrl
+                )
                 val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
-                audioPlayerIntent.putExtra(TRACK_DATA, track)
+                audioPlayerIntent.putExtra(TRACK_DATA, trackData)
                 startActivity(audioPlayerIntent)
             }
         }
@@ -120,8 +133,20 @@ class SearchActivity : AppCompatActivity(){
             if (clickDebounce()) {
                 viewModel.addTrackToHistory(track)
                 trackAdapterSearchHistory.notifyDataSetChanged()
+                val trackData = TrackData(
+                    track.trackName,
+                    track.artistName,
+                    track.trackTimeMillis,
+                    track.artworkUrl100,
+                    track.trackId,
+                    track.collectionName,
+                    track.releaseDate,
+                    track.primaryGenreName,
+                    track.country,
+                    track.previewUrl
+                )
                 val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
-                audioPlayerIntent.putExtra(TRACK_DATA, track)
+                audioPlayerIntent.putExtra(TRACK_DATA, trackData)
                 startActivity(audioPlayerIntent)
             }
         }
@@ -171,29 +196,9 @@ class SearchActivity : AppCompatActivity(){
                 clearIcon.visibility = clearIconVisibility(s)
                 viewModel.searchDebounce(changedText = s?.toString() ?: "")
 
-
-               /* saveEditText = s.toString()
-                if (s.isNullOrEmpty()){
-                    trackList.clear()
-                    trackAdapter.notifyDataSetChanged()
-                    viewModel.searchHistoryOrAllHide()
-                }*/
-                /*saveEditText = s?.toString() ?: ""*/
-
-
                 if (inputEditText.hasFocus() && s?.isNullOrEmpty() == true) {
                     viewModel.searchHistoryOrAllHide()
-                } /*else {
-                    searchHistoryLayout.isVisible = false
-                    trackList.clear()
-                    trackAdapter.notifyDataSetChanged()
-
-                    *//*viewModel.searchDebounce(changedText = saveEditText)
-                    if (s?.isEmpty() == true){
-                        viewModel.showSearchHistory()
-                    }*//*
-                }*/
-
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -225,12 +230,6 @@ class SearchActivity : AppCompatActivity(){
             View.VISIBLE
         }
     }
-
-    /*private fun hideKeyboard() {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val view = this.currentFocus ?: View(this)
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
-    }*/
 
     override fun onSaveInstanceState(textwatcher: Bundle) {
         super.onSaveInstanceState(textwatcher)
@@ -307,23 +306,11 @@ class SearchActivity : AppCompatActivity(){
         placeholderLinearLayout.isVisible = false
         progressBar.isVisible = false
         searchHistoryLayout.isVisible = true
-        /*trackList.clear()
-        trackAdapter.notifyDataSetChanged()*/
     }
 
     private fun showToast(additionalMessage: String) {
         Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG).show()
     }
-
-    /*private fun showVariantMessage(text: String) {
-        if (text == getString(R.string.nothing_found)) {
-            placeholderErrorImage.setImageResource(R.drawable.error_search)
-            updateQueryButton.isVisible = false
-        } else {
-            placeholderErrorImage.setImageResource(R.drawable.error_internet)
-            updateQueryButton.isVisible = true
-        }
-    }*/
 
     private fun clickDebounce(): Boolean {
         val current = isClickAllowed
@@ -338,6 +325,5 @@ class SearchActivity : AppCompatActivity(){
         private const val KEY = "Key"
         private const val TRACK_DATA = "track_data"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
-        private const val REQUEST_CODE_PLAY_TRACK = 1 // Задаем код запроса
     }
 }

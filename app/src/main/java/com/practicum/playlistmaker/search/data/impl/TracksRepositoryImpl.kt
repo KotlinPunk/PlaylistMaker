@@ -9,6 +9,7 @@ import com.practicum.playlistmaker.search.data.dto.TrackSearchRequest
 import com.practicum.playlistmaker.search.domain.api.repo.TracksRepository
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.data.impl.storage.SearchHistoryImpl
+import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.utils.Resource
 
 class TracksRepositoryImpl(
@@ -38,7 +39,7 @@ class TracksRepositoryImpl(
             .map { it.toTrack() } // получаем именно что список треков согласно domain
     }
 
-    override fun addTrackToHistoryRepo(track: Track) {
+    override fun addTrackToHistoryRepo(track: TrackData) {
         return searchHistoryImpl.addTrackInHistoryTrackList(track.toTrackDto()) // закладываем DTO на хранение
     }
 
@@ -63,6 +64,21 @@ class TracksRepositoryImpl(
     }
 
     private fun Track.toTrackDto(): TrackDto {
+        return TrackDto(
+            trackName = trackName,
+            artistName = artistName,
+            trackTimeMillis = trackTimeMillis,
+            artworkUrl100 = artworkUrl100,
+            trackId = trackId,
+            collectionName = collectionName,
+            releaseDate = releaseDate,
+            primaryGenreName = primaryGenreName,
+            country = country,
+            previewUrl = previewUrl ?: ""
+        )
+    }
+
+    private fun TrackData.toTrackDto(): TrackDto {
         return TrackDto(
             trackName = trackName,
             artistName = artistName,

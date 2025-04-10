@@ -1,28 +1,24 @@
 package com.practicum.playlistmaker.player.ui.player
 
-import android.content.Context
+import com.practicum.playlistmaker.search.data.models.TrackData
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.practicum.playlistmaker.utils.Creator
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
-import com.practicum.playlistmaker.player.domain.api.intr.MediaPlayerInteractor
 import com.practicum.playlistmaker.player.ui.viewmodel.AudioPlayerViewModel
 
 class AudioplayerActivity : AppCompatActivity() {
 
     private var _binding: ActivityAudioplayerBinding? = null
     private val binding: ActivityAudioplayerBinding get() = requireNotNull(_binding) { "Binding wasn't initiliazed!" }
-    private var track: Track? = null
+    private var trackData: TrackData? = null
     private lateinit var viewModel: AudioPlayerViewModel
-    private val creator: Creator by lazy { Creator(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,12 +29,14 @@ class AudioplayerActivity : AppCompatActivity() {
         _binding = ActivityAudioplayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(TRACK_DATA, Track::class.java)
+        trackData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(TRACK_DATA, TrackData::class.java)
         } else {
             @Suppress("DEPRECATION")
-            intent.getParcelableExtra(TRACK_DATA) as? Track
+            intent.getParcelableExtra<TrackData>(TRACK_DATA)
         }
+
+        val track: Track? = trackData?.toTrack()
 
         track?.let { viewModel.setTrack(it) }
 
@@ -62,7 +60,7 @@ class AudioplayerActivity : AppCompatActivity() {
         }
 
         binding.playTrack.setOnClickListener {
-            playbackControl()
+            viewModel.togglePlaybackControl()
         }
 
         binding.arrowback.setOnClickListener {
@@ -83,14 +81,6 @@ class AudioplayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.releasePlayerVM()
-    }
-
-    private fun playbackControl() {
-        if (viewModel.isPlayingPlayerVM()) {
-            viewModel.pausePlayerVM()
-        } else {
-            viewModel.startPlayerVM()
-        }
     }
 
     private fun setDataTrack(track: Track) {

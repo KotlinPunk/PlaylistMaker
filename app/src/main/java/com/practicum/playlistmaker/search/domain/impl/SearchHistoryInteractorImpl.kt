@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.search.domain.impl
 
+import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.search.domain.api.intr.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.domain.api.repo.TracksRepository
 import com.practicum.playlistmaker.search.domain.models.Track
@@ -10,7 +11,7 @@ class SearchHistoryInteractorImpl(private val repository: TracksRepository) :
         return repository.getTrackHistoryRepo()
     }
 
-    override fun addTrackToHistoryIntr(track: Track) {
+    override fun addTrackToHistoryIntr(track: TrackData) {
         repository.addTrackToHistoryRepo(track)
     }
 

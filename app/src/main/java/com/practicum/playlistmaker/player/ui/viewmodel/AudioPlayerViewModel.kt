@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistmaker.player.data.impl.MediaPlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.api.intr.MediaPlayerInteractor
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.utils.Creator
@@ -28,6 +27,7 @@ class AudioPlayerViewModel(application: Application) : AndroidViewModel(applicat
 
     private val _currentTime = MutableLiveData<String>(BY_ZEROS) // слушаем время проигрывания
     val currentTime: LiveData<String> = _currentTime
+
 
     //слушаем состояние проигрывателя: готов он или нет
     private val _isPrepared = MutableLiveData<Boolean>(false)
@@ -50,6 +50,15 @@ class AudioPlayerViewModel(application: Application) : AndroidViewModel(applicat
         )
     }
 
+    fun togglePlaybackControl() { //теперь тут следим за переключением состояния. общий маркер _isPlaying
+        if (_isPlaying.value == true) {
+            pausePlayerVM()
+        } else {
+            startPlayerVM()
+        }
+    }
+
+
     fun startPlayerVM() {
         mediaPlayerInteractor.startPlayerIntr()
         _isPlaying.value = true // обновляем Live Data
@@ -62,10 +71,6 @@ class AudioPlayerViewModel(application: Application) : AndroidViewModel(applicat
 
     fun releasePlayerVM() {
         mediaPlayerInteractor.releasePlayerIntr()
-    }
-
-    fun isPlayingPlayerVM(): Boolean {
-        return mediaPlayerInteractor.isPlayingPlayerIntr()
     }
 
     companion object {

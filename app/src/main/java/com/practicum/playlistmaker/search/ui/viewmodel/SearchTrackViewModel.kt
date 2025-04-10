@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.search.domain.api.intr.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.domain.api.intr.SearchTracksInteractor
 import com.practicum.playlistmaker.search.domain.models.ToastState
@@ -28,7 +29,7 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
         creator.searchHistoryInteractor
     }
 
-    private val trackList = ArrayList<Track>()
+    private val trackList: MutableList<Track> = ArrayList()
     private val mainThreadHandler = Handler(Looper.getMainLooper())
     private var latestSearchText: String? = null
 
@@ -83,7 +84,19 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
 
     // функция добавления в историю поиска
     fun addTrackToHistory(track: Track) {
-        historyInteractor.addTrackToHistoryIntr(track)
+        val trackData = TrackData(
+            track.trackName,
+            track.artistName,
+            track.trackTimeMillis,
+            track.artworkUrl100,
+            track.trackId,
+            track.collectionName,
+            track.releaseDate,
+            track.primaryGenreName,
+            track.country,
+            track.previewUrl
+        )
+        historyInteractor.addTrackToHistoryIntr(trackData)
         loadSearchHistory() // как добавили, сразу обновили LiveData
     }
 
@@ -145,9 +158,6 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
                     }
                 })
         } else {
-            /*val showHistory = historyInteractor.getTrackHistoryIntr().isNotEmpty()
-            renderState(if (showHistory) TracksState.EmptyInputShowHistory else TracksState.EmptyAll)*/
-            /*renderState(TracksState.EmptyAll)*/
             searchHistoryOrAllHide()
         }
     }
