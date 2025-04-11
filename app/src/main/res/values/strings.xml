@@ -24,4 +24,5 @@
     <string name="year">Год</string>
     <string name="album">Альбом</string>
     <string name="track_time">Длительность</string>
+    <string name="toast_error_intent">Невозможно выполнить действие</string>
 </resources>
