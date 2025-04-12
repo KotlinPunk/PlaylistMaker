@@ -4,20 +4,10 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistmaker.player.domain.api.intr.MediaPlayerInteractor
+import com.practicum.playlistmaker.player.domain.api.intr.AudioPlayerInteractor
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.utils.Creator
 
-class AudioPlayerViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val creator: Creator by lazy { Creator(application) }
-    private val mediaPlayerInteractor: MediaPlayerInteractor by lazy {
-        creator.mediaPlayerInteractor
-    }
+class AudioPlayerViewModel(application: Application, private val mediaPlayerInteractor: AudioPlayerInteractor) : AndroidViewModel(application) {
 
     private val _track = MutableLiveData<Track>()
     val track: LiveData<Track> = _track
@@ -75,11 +65,5 @@ class AudioPlayerViewModel(application: Application) : AndroidViewModel(applicat
 
     companion object {
         private const val BY_ZEROS = "0:00"
-
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                AudioPlayerViewModel(this[APPLICATION_KEY] as Application)
-            }
-        }
     }
 }

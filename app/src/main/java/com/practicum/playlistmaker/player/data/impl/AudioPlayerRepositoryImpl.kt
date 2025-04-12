@@ -3,10 +3,10 @@ package com.practicum.playlistmaker.player.data.impl
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
-import com.practicum.playlistmaker.player.domain.api.repo.MediaPlayerRepository
+import com.practicum.playlistmaker.player.domain.api.repo.AudioPlayerRepository
 import java.util.Locale
 
-class MediaPlayerRepositoryImpl() : MediaPlayerRepository {
+class AudioPlayerRepositoryImpl() : AudioPlayerRepository {
 
     private val mediaPlayer = MediaPlayer()
     private val dateFormat by lazy {

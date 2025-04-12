@@ -31,6 +31,7 @@ import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.search.domain.models.ToastState
 import com.practicum.playlistmaker.search.domain.models.TracksState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchTrackViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity(){
     private var saveEditText = ""
@@ -43,7 +44,7 @@ class SearchActivity : AppCompatActivity(){
     private var isClickAllowed = true
     private var textWatcher: TextWatcher? = null
 
-    private lateinit var viewModel: SearchTrackViewModel
+    private val viewModel by viewModel<SearchTrackViewModel>()
 
     private lateinit var arrowbackButton: ImageButton
     private lateinit var inputEditText: EditText
@@ -83,11 +84,6 @@ class SearchActivity : AppCompatActivity(){
 
         rvTrackList.adapter = trackAdapter
         searchHistoryRV.adapter = trackAdapterSearchHistory
-
-        viewModel = ViewModelProvider(
-            this,
-            SearchTrackViewModel.getViewModelFactory()
-        )[SearchTrackViewModel::class.java]
 
         viewModel.observeState().observe(this) {
             render(it)

@@ -1,6 +1,6 @@
 package com.practicum.playlistmaker.player.domain.api.intr
 
-interface MediaPlayerInteractor {
+interface AudioPlayerInteractor {
     fun preparePlayerIntr(
         previewUrl: String?,
         onPrepared: () -> Unit,

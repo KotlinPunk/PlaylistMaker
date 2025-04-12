@@ -1,10 +1,10 @@
 package com.practicum.playlistmaker.player.domain.impl
 
-import com.practicum.playlistmaker.player.domain.api.intr.MediaPlayerInteractor
-import com.practicum.playlistmaker.player.domain.api.repo.MediaPlayerRepository
+import com.practicum.playlistmaker.player.domain.api.intr.AudioPlayerInteractor
+import com.practicum.playlistmaker.player.domain.api.repo.AudioPlayerRepository
 
-class MediaPlayerInteractorImpl(private val mediaPlayerRepository: MediaPlayerRepository) :
-    MediaPlayerInteractor {
+class AudioPlayerInteractorImpl(private val mediaPlayerRepository: AudioPlayerRepository) :
+    AudioPlayerInteractor {
     override fun preparePlayerIntr(
         previewUrl: String?,
         onPrepared: () -> Unit,
