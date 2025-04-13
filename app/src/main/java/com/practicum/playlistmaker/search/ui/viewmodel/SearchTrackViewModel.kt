@@ -19,15 +19,11 @@ import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.domain.models.TracksState
 import com.practicum.playlistmaker.utils.Creator
 
-class SearchTrackViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val creator: Creator by lazy { Creator(application) }
-    private val searchTracksInteractor: SearchTracksInteractor by lazy {
-        creator.searchTracksInteractor
-    }
-    private val historyInteractor: SearchHistoryInteractor by lazy {
-        creator.searchHistoryInteractor
-    }
+class SearchTrackViewModel(
+    application: Application,
+    private val searchTracksInteractor: SearchTracksInteractor,
+    private val historyInteractor: SearchHistoryInteractor
+) : AndroidViewModel(application) {
 
     private val trackList: MutableList<Track> = ArrayList()
     private val mainThreadHandler = Handler(Looper.getMainLooper())
@@ -164,11 +160,5 @@ class SearchTrackViewModel(application: Application) : AndroidViewModel(applicat
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
-
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SearchTrackViewModel(this[APPLICATION_KEY] as Application)
-            }
-        }
     }
 }

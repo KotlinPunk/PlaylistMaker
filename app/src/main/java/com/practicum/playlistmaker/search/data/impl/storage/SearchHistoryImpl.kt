@@ -5,7 +5,10 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.search.data.dto.TrackDto
 
-class SearchHistoryImpl(private val sharedPrefs: SharedPreferences) {
+class SearchHistoryImpl(
+    private val sharedPrefs: SharedPreferences,
+    private val gson: Gson
+) {
 
     private val trackListHistory = getHistoryTrackList().toMutableList()
 
@@ -42,12 +45,12 @@ class SearchHistoryImpl(private val sharedPrefs: SharedPreferences) {
     }
 
     private fun createJsonFromTrackList(trackList: List<TrackDto>): String { //передаём
-        return Gson().toJson(trackList)
+        return gson.toJson(trackList)
     }
 
     private fun createTrackListFromJson(json: String): List<TrackDto> { //получаем
         val type = object : TypeToken<List<TrackDto>>() {}.type
-        return Gson().fromJson(json, type)
+        return gson.fromJson(json, type)
     }
 
     companion object {

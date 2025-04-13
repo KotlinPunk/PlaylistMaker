@@ -12,20 +12,17 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.player.ui.viewmodel.AudioPlayerViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AudioplayerActivity : AppCompatActivity() {
 
     private var _binding: ActivityAudioplayerBinding? = null
     private val binding: ActivityAudioplayerBinding get() = requireNotNull(_binding) { "Binding wasn't initiliazed!" }
     private var trackData: TrackData? = null
-    private lateinit var viewModel: AudioPlayerViewModel
+    private val viewModel by viewModel<AudioPlayerViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(
-            this,
-            AudioPlayerViewModel.getViewModelFactory()
-        )[AudioPlayerViewModel::class.java]
         _binding = ActivityAudioplayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

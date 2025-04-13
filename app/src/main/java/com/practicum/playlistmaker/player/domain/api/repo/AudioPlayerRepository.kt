@@ -1,6 +1,6 @@
 package com.practicum.playlistmaker.player.domain.api.repo
 
-interface MediaPlayerRepository {
+interface AudioPlayerRepository {
     fun preparePlayerRepo(
         previewUrl: String?,
         onPrepared: () -> Unit,
