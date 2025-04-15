@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/day_white_and_night_dark"
     android:orientation="vertical">
 
     <LinearLayout
@@ -20,4 +21,24 @@
             style="@style/TextStyleTitleActivity"
             android:text="@string/media_library" />
     </LinearLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/sixteen_dp"
+        android:layout_marginEnd="@dimen/sixteen_dp"
+        android:background="@color/day_white_and_night_dark"
+        android:fontFamily="@font/ys_display_medium"
+        android:textAllCaps="false"
+        android:textFontWeight="500"
+        android:textSize="@dimen/fourteen_sp"
+        app:tabIndicatorColor="@color/day_dark_and_night_white"
+        app:tabIndicatorFullWidth="true"
+        app:tabTextColor="@color/day_dark_and_night_white" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>
