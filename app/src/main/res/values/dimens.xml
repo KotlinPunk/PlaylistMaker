@@ -13,8 +13,11 @@
     <dimen name="forty_four_dp">44dp</dimen>
     <dimen name="fifty_two">52dp</dimen>
     <dimen name="sixty_four_dp">64dp</dimen>
+    <dimen name="seventy_two_dp">72dp</dimen>
     <dimen name="one_hundred_dp">100dp</dimen>
+    <dimen name="one_hundred_twenty_eight_dp">128dp</dimen>
     <dimen name="one_hundred_forty_dp">140dp</dimen>
+    <dimen name="two_hundred_twelve_dp">212dp</dimen>
 
     <dimen name="eleven_sp">11sp</dimen>
     <dimen name="thirteen_sp">13sp</dimen>
