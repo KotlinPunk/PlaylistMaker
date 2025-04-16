@@ -20,16 +20,7 @@
             android:name=".player.ui.player.AudioplayerActivity"
             android:exported="false" />
         <activity
-            android:name=".library.ui.MediaLibraryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".search.ui.search.SearchActivity"
-            android:exported="false" />
-        <activity
-            android:name=".settings.ui.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".main.ui.MainActivity"
+            android:name=".root.RootActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
