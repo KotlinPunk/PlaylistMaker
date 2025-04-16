@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.search.ui.search
 
+import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Bundle
@@ -24,6 +25,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.player.ui.player.AudioplayerActivity
@@ -49,6 +51,7 @@ class SearchFragment : Fragment() {
     private val mainThreadHandler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
     private var textWatcher: TextWatcher? = null
+    private var bottomNavigationView: BottomNavigationView? = null
 
     private val viewModel by viewModel<SearchTrackViewModel>()
 
@@ -97,6 +100,8 @@ class SearchFragment : Fragment() {
 
         rvTrackList.adapter = trackAdapter
         searchHistoryRV.adapter = trackAdapterSearchHistory
+
+        bottomNavigationView = activity?.findViewById(R.id.bottomNavigationView)
 
         viewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
@@ -169,7 +174,7 @@ class SearchFragment : Fragment() {
             trackList.clear()
             trackAdapter.notifyDataSetChanged()
             inputMethodManager?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
-
+            bottomNavigationView?.isVisible = true
         }
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -180,6 +185,12 @@ class SearchFragment : Fragment() {
         }
 
         inputEditText.setOnFocusChangeListener { _, hasFocus ->
+
+            if (hasFocus) {
+                bottomNavigationView?.isVisible = false
+            } else {
+                bottomNavigationView?.isVisible = true
+            }
             if (hasFocus && inputEditText.text.isNullOrEmpty()) {
                 viewModel.searchHistoryOrAllHide()
             }
@@ -234,6 +245,18 @@ class SearchFragment : Fragment() {
         } else {
             View.VISIBLE
         }
+    }
+
+    private fun isVisibleKeyboard(view: View?): Boolean {
+        if (view == null) {
+            return false
+        }
+        val inputMethodManager =
+            view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        if (inputMethodManager == null) {
+            return false
+        }
+        return inputMethodManager.isAcceptingText
     }
 
     private fun render(state: TracksState) {

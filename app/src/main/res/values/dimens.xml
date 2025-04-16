@@ -20,6 +20,7 @@
     <dimen name="two_hundred_twelve_dp">212dp</dimen>
 
     <dimen name="eleven_sp">11sp</dimen>
+    <dimen name="twelve_sp">12sp</dimen>
     <dimen name="thirteen_sp">13sp</dimen>
     <dimen name="fourteen_sp">14sp</dimen>
     <dimen name="sixteen_sp">16sp</dimen>

@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootFragmentContainerView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/container_view"
@@ -14,23 +13,22 @@
         android:layout_height="0dp"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
-        tools:context=".root.RootActivity"
-
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/main_navigation_graph" />
+        app:navGraph="@navigation/main_navigation_graph"
+        tools:context=".root.RootActivity" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/day_white_and_night_dark"
-
+        app:itemIconTint="@color/bottom_nav_icon_color"
+        app:itemTextAppearance="@style/BottomNavigationViewTextStyle"
+        app:itemTextColor="@color/bottom_nav_text_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-
         app:menu="@menu/botton_navigator" />
 </androidx.constraintlayout.widget.ConstraintLayout>

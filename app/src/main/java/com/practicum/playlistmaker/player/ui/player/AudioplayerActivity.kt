@@ -113,6 +113,5 @@ class AudioplayerActivity : AppCompatActivity() {
 
     companion object {
         private const val TRACK_DATA = "track_data"
-        private const val BY_ZEROS = "0:00"
     }
 }
