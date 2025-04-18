@@ -12,19 +12,30 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintBottom_toTopOf="@id/divider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/main_navigation_graph"
         tools:context=".root.RootActivity" />
 
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:dividerColor="@color/color_divider"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/sixty_four_dp"
         android:background="@color/day_white_and_night_dark"
         app:itemIconTint="@color/bottom_nav_icon_color"
+        app:itemPaddingBottom="@dimen/eight_dp"
+        app:itemPaddingTop="@dimen/eight_dp"
         app:itemTextAppearance="@style/BottomNavigationViewTextStyle"
         app:itemTextColor="@color/bottom_nav_text_color"
         app:layout_constraintBottom_toBottomOf="parent"

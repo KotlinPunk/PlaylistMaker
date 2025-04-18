@@ -12,6 +12,7 @@
     <dimen name="forty_dp">40dp</dimen>
     <dimen name="forty_four_dp">44dp</dimen>
     <dimen name="fifty_two">52dp</dimen>
+    <dimen name="fifty_six">56dp</dimen>
     <dimen name="sixty_four_dp">64dp</dimen>
     <dimen name="seventy_two_dp">72dp</dimen>
     <dimen name="one_hundred_dp">100dp</dimen>

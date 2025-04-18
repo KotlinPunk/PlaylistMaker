@@ -8,10 +8,9 @@ class AudioPlayerInteractorImpl(private val mediaPlayerRepository: AudioPlayerRe
     override fun preparePlayerIntr(
         previewUrl: String?,
         onPrepared: () -> Unit,
-        onCompletion: () -> Unit,
-        onTimeUpdate: (String) -> Unit
+        onCompletion: () -> Unit
     ) {
-        mediaPlayerRepository.preparePlayerRepo(previewUrl, onPrepared, onCompletion, onTimeUpdate)
+        mediaPlayerRepository.preparePlayerRepo(previewUrl, onPrepared, onCompletion)
     }
 
     override fun startPlayerIntr() {
@@ -26,7 +25,7 @@ class AudioPlayerInteractorImpl(private val mediaPlayerRepository: AudioPlayerRe
         mediaPlayerRepository.releasePlayerRepo()
     }
 
-    override fun isPlayingPlayerIntr(): Boolean {
-        return mediaPlayerRepository.isPlayingPlayerRepo()
+    override fun getCurrentTimeIntr(): String {
+        return mediaPlayerRepository.getCurrentTimeRepo()
     }
 }

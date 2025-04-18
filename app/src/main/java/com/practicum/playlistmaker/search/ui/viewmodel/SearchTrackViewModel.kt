@@ -6,10 +6,6 @@ import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.search.domain.api.intr.SearchHistoryInteractor
@@ -17,7 +13,6 @@ import com.practicum.playlistmaker.search.domain.api.intr.SearchTracksInteractor
 import com.practicum.playlistmaker.search.domain.models.ToastState
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.domain.models.TracksState
-import com.practicum.playlistmaker.utils.Creator
 
 class SearchTrackViewModel(
     application: Application,

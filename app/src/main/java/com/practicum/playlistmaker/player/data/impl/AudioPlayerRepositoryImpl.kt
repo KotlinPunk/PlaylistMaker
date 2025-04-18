@@ -1,92 +1,53 @@
 package com.practicum.playlistmaker.player.data.impl
 
 import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
 import com.practicum.playlistmaker.player.domain.api.repo.AudioPlayerRepository
+import com.practicum.playlistmaker.player.ui.player.AudioplayerState
 import java.util.Locale
 
 class AudioPlayerRepositoryImpl() : AudioPlayerRepository {
 
-    private val mediaPlayer = MediaPlayer()
+    private var mediaPlayer: MediaPlayer? = null
+    private var playerState: AudioplayerState = AudioplayerState.State_default
+
     private val dateFormat by lazy {
         android.icu.text.SimpleDateFormat(
             "mm:ss",
             Locale.getDefault()
         )
     }
-    private val mainThreadHandler = Handler(Looper.getMainLooper())
-    private var playerState = STATE_DEFAULT
-    private var updateTimeRunnable: Runnable? = null
 
     override fun preparePlayerRepo(
         previewUrl: String?,
         onPrepared: () -> Unit,
         onCompletion: () -> Unit,
-        onTimeUpdate: (String) -> Unit
-    ) {
-        try {
-            mediaPlayer.setDataSource(previewUrl)
-            mediaPlayer.prepareAsync()
-            mediaPlayer.setOnPreparedListener {
-                playerState = STATE_PREPARED
-                onPrepared()
-                startTimer()
-            }
-            mediaPlayer.setOnCompletionListener {
-                playerState = STATE_PREPARED
-                onCompletion()
-                stopTimer()
-            }
-            updateTimeRunnable = object : Runnable {
-                override fun run() {
-                    if (playerState == STATE_PLAYING) {
-                        onTimeUpdate(dateFormat.format(mediaPlayer.currentPosition))
-                        mainThreadHandler.postDelayed(this, UPDATE_TIMER)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
 
+        ) {
+        mediaPlayer = MediaPlayer().apply {
+            setDataSource(previewUrl)
+            prepareAsync()
+            setOnPreparedListener { onPrepared() }
+            setOnCompletionListener { onCompletion() }
+        }
     }
 
     override fun startPlayerRepo() {
-        mediaPlayer.start()
-        playerState = STATE_PLAYING
-        startTimer()
+        mediaPlayer?.start()
+        playerState = AudioplayerState.State_playing
     }
 
     override fun pausePlayerRepo() {
-        mediaPlayer.pause()
-        playerState = STATE_PAUSED
-        stopTimer()
+        mediaPlayer?.pause()
+        playerState = AudioplayerState.State_paused
+
     }
 
     override fun releasePlayerRepo() {
-        stopTimer()
-        mediaPlayer.release()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 
-    override fun isPlayingPlayerRepo(): Boolean {
-        return playerState == STATE_PLAYING
-    }
-
-    private fun startTimer() {
-        mainThreadHandler.post(updateTimeRunnable!!)
-    }
-
-    private fun stopTimer() {
-        updateTimeRunnable?.let(mainThreadHandler::removeCallbacks)
-    }
-
-    companion object {
-        private const val UPDATE_TIMER = 500L
-
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
+    override fun getCurrentTimeRepo(): String {
+        return dateFormat.format(mediaPlayer?.currentPosition)
     }
 }

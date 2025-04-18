@@ -55,7 +55,6 @@ class SearchFragment : Fragment() {
 
     private val viewModel by viewModel<SearchTrackViewModel>()
 
-    private lateinit var arrowbackButton: ImageButton
     private lateinit var inputEditText: EditText
     private lateinit var clearIcon: ImageView
     private lateinit var rvTrackList: RecyclerView
@@ -174,7 +173,6 @@ class SearchFragment : Fragment() {
             trackList.clear()
             trackAdapter.notifyDataSetChanged()
             inputMethodManager?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
-            bottomNavigationView?.isVisible = true
         }
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -185,12 +183,6 @@ class SearchFragment : Fragment() {
         }
 
         inputEditText.setOnFocusChangeListener { _, hasFocus ->
-
-            if (hasFocus) {
-                bottomNavigationView?.isVisible = false
-            } else {
-                bottomNavigationView?.isVisible = true
-            }
             if (hasFocus && inputEditText.text.isNullOrEmpty()) {
                 viewModel.searchHistoryOrAllHide()
             }
@@ -234,9 +226,10 @@ class SearchFragment : Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         textWatcher?.let { inputEditText.removeTextChangedListener(it) }
+        _binding = null
     }
 
     private fun clearIconVisibility(s: CharSequence?): Int {
@@ -339,7 +332,6 @@ class SearchFragment : Fragment() {
     }
 
     companion object {
-        private const val KEY = "Key"
         private const val TRACK_DATA = "track_data"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
