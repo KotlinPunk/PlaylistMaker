@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.player.ui.player
+package com.practicum.playlistmaker.player.domain.models
 
 sealed interface AudioplayerState {
     object State_default : AudioplayerState

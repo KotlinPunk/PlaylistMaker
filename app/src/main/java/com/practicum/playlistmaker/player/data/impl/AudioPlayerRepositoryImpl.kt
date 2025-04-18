@@ -2,7 +2,7 @@ package com.practicum.playlistmaker.player.data.impl
 
 import android.media.MediaPlayer
 import com.practicum.playlistmaker.player.domain.api.repo.AudioPlayerRepository
-import com.practicum.playlistmaker.player.ui.player.AudioplayerState
+import com.practicum.playlistmaker.player.domain.models.AudioplayerState
 import java.util.Locale
 
 class AudioPlayerRepositoryImpl() : AudioPlayerRepository {

@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.player.domain.api.intr.AudioPlayerInteractor
-import com.practicum.playlistmaker.player.ui.player.AudioplayerState
+import com.practicum.playlistmaker.player.domain.models.AudioplayerState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

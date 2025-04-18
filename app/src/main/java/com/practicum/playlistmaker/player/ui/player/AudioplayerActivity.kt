@@ -10,6 +10,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
+import com.practicum.playlistmaker.player.domain.models.AudioplayerState
 import com.practicum.playlistmaker.player.ui.viewmodel.AudioPlayerViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
