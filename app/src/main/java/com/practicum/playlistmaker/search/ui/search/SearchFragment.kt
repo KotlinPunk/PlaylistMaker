@@ -24,6 +24,7 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.practicum.playlistmaker.R
@@ -34,6 +35,8 @@ import com.practicum.playlistmaker.search.domain.models.ToastState
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.domain.models.TracksState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchTrackViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
@@ -48,7 +51,6 @@ class SearchFragment : Fragment() {
     private val trackListSearchHistory = ArrayList<Track>()
     private var trackAdapter = TrackAdapter(trackList)
     private val trackAdapterSearchHistory = TrackAdapter(trackListSearchHistory)
-    private val mainThreadHandler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
     private var textWatcher: TextWatcher? = null
     private var bottomNavigationView: BottomNavigationView? = null
@@ -326,7 +328,10 @@ class SearchFragment : Fragment() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            mainThreadHandler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
         }
         return current
     }
@@ -335,5 +340,4 @@ class SearchFragment : Fragment() {
         private const val TRACK_DATA = "track_data"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
-
 }
