@@ -4,12 +4,11 @@ interface AudioPlayerRepository {
     fun preparePlayerRepo(
         previewUrl: String?,
         onPrepared: () -> Unit,
-        onCompletion: () -> Unit,
-        onTimeUpdate: (String) -> Unit
+        onCompletion: () -> Unit
     )
 
     fun startPlayerRepo()
     fun pausePlayerRepo()
     fun releasePlayerRepo()
-    fun isPlayingPlayerRepo(): Boolean
+    fun getCurrentTimeRepo(): String
 }

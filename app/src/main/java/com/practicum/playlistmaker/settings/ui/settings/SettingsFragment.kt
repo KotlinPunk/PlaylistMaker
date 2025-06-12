@@ -48,4 +48,9 @@ class SettingsFragment : Fragment() {
             viewModel.switchTheme(checked)
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

@@ -5,12 +5,12 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
+import com.practicum.playlistmaker.player.domain.models.AudioplayerState
 import com.practicum.playlistmaker.player.ui.viewmodel.AudioPlayerViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -34,22 +34,39 @@ class AudioplayerActivity : AppCompatActivity() {
         }
 
         val track: Track? = trackData?.toTrack()
+        track?.let {
+            viewModel.setPreviewUrl(it.previewUrl)
+            with(binding) {
+                nameTrackData.text = track.trackName
+                singerTrackData.text = track.artistName
+                timeTrackData.text = track.getTimeTrack()
+                albumTrackData.text = track.collectionName
+                yearTrackData.text = track.getYearTrack()
+                genreTrackData.text = track.primaryGenreName
+                countryTrackData.text = track.country
 
-        track?.let { viewModel.setTrack(it) }
+                if (track.collectionName.isNullOrEmpty()) {
+                    albumTrackData.visibility = View.GONE
+                    albumTrack.visibility = View.GONE
+                } else {
+                    albumTrackData.text = track.collectionName
+                }
 
-        viewModel.track.observe(this) { track ->
-            setDataTrack(track)
+                Glide.with(applicationContext)
+                    .load(track.getCoverArtwork())
+                    .placeholder(R.drawable.ic_placeholder_312_x_312)
+                    .transform(
+                        RoundedCorners(
+                            this@AudioplayerActivity.resources.getDimensionPixelOffset(
+                                R.dimen.eight_dp
+                            )
+                        )
+                    )
+                    .into(placeholderTrack)
+            }
         }
-
-        viewModel.isPrepared.observe(this) { isPrepared ->
-            binding.playTrack.isEnabled = isPrepared
-        }
-
-        viewModel.isPlaying.observe(this) { isPlaying ->
-            binding.playTrack.setImageResource(
-                if (isPlaying) R.drawable.ic_pause_track_button
-                else R.drawable.ic_play_track_button
-            )
+        viewModel.playerState.observe(this) { state ->
+            updatePlayerState(state)
         }
 
         viewModel.currentTime.observe(this) { time ->
@@ -57,7 +74,7 @@ class AudioplayerActivity : AppCompatActivity() {
         }
 
         binding.playTrack.setOnClickListener {
-            viewModel.togglePlaybackControl()
+            viewModel.playbackControl()
         }
 
         binding.arrowback.setOnClickListener {
@@ -65,54 +82,29 @@ class AudioplayerActivity : AppCompatActivity() {
         }
     }
 
+    private fun updatePlayerState(state: AudioplayerState) {
+        binding.playTrack.setImageResource(
+            when (state) {
+                AudioplayerState.State_default -> R.drawable.ic_play_track_button
+                AudioplayerState.State_prepared -> R.drawable.ic_play_track_button
+                AudioplayerState.State_playing -> R.drawable.ic_pause_track_button
+                AudioplayerState.State_paused -> R.drawable.ic_play_track_button
+                AudioplayerState.State_completed -> R.drawable.ic_play_track_button
+            }
+        )
+    }
+
     override fun onPause() {
         super.onPause()
         viewModel.pausePlayerVM()
     }
 
-    override fun onStop() {
-        super.onStop()
-        viewModel.pausePlayerVM()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.releasePlayerVM()
-    }
-
-    private fun setDataTrack(track: Track) {
-        with(binding) {
-            nameTrackData.text = track.trackName
-            singerTrackData.text = track.artistName
-            timeTrackData.text = track.getTimeTrack()
-            albumTrackData.text = track.collectionName
-            yearTrackData.text = track.getYearTrack()
-            genreTrackData.text = track.primaryGenreName
-            countryTrackData.text = track.country
-
-            if (track.collectionName.isNullOrEmpty()) {
-                albumTrackData.visibility = View.GONE
-                albumTrack.visibility = View.GONE
-            } else {
-                albumTrackData.text = track.collectionName
-            }
-
-            Glide.with(applicationContext)
-                .load(track.getCoverArtwork())
-                .placeholder(R.drawable.ic_placeholder_312_x_312)
-                .transform(
-                    RoundedCorners(
-                        this@AudioplayerActivity.resources.getDimensionPixelOffset(
-                            R.dimen.eight_dp
-                        )
-                    )
-                )
-                .into(placeholderTrack)
-        }
+        _binding = null
     }
 
     companion object {
         private const val TRACK_DATA = "track_data"
-        private const val BY_ZEROS = "0:00"
     }
 }

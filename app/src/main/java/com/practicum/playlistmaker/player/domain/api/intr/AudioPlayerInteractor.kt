@@ -4,12 +4,11 @@ interface AudioPlayerInteractor {
     fun preparePlayerIntr(
         previewUrl: String?,
         onPrepared: () -> Unit,
-        onCompletion: () -> Unit,
-        onTimeUpdate: (String) -> Unit
+        onCompletion: () -> Unit
     )
 
     fun startPlayerIntr()
     fun pausePlayerIntr()
     fun releasePlayerIntr()
-    fun isPlayingPlayerIntr(): Boolean
+    fun getCurrentTimeIntr(): String
 }
