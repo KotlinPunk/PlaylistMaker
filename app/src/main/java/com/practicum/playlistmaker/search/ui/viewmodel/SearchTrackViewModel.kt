@@ -15,6 +15,8 @@ import com.practicum.playlistmaker.search.domain.models.TracksState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.collections.addAll
+import kotlin.text.clear
 
 class SearchTrackViewModel(
     application: Application,
