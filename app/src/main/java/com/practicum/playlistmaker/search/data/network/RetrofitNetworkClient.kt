@@ -6,15 +6,13 @@ import android.net.NetworkCapabilities
 import com.practicum.playlistmaker.search.data.NetworkClient
 import com.practicum.playlistmaker.search.data.dto.Response
 import com.practicum.playlistmaker.search.data.dto.TrackSearchRequest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitNetworkClient(private val context: Context, private val itunesService: TrackApi) :
     NetworkClient {
 
-    suspend override fun doRequest(dto: Any): Response {
+    override fun doRequest(dto: Any): Response {
         if (isConnected() == false) {
             return Response().apply { resultCode = -1 }
         }
@@ -24,13 +22,13 @@ class RetrofitNetworkClient(private val context: Context, private val itunesServ
 
         }
 
-        return withContext(Dispatchers.IO) {
-            try {
-                val resp = itunesService.search(dto.text)
-                resp.apply { resultCode = 200 }
-            } catch (e: Throwable) {
-                Response().apply { resultCode = 500 }
-            }
+        val resp = itunesService.search(dto.text).execute()
+        val body = resp.body() ?: Response()
+
+        return if (body != null) {
+            body.apply { resultCode = resp.code() }
+        } else {
+            return Response().apply { resultCode = resp.code() }
         }
     }
 

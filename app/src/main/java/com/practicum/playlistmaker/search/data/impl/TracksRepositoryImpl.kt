@@ -11,8 +11,6 @@ import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.data.impl.storage.SearchHistoryImpl
 import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.utils.Resource
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 class TracksRepositoryImpl(
     private val networkClient: NetworkClient,
@@ -20,19 +18,17 @@ class TracksRepositoryImpl(
     private val context: Context
 ) : TracksRepository {
 
-    override fun searchTracksRepo(text: String): Flow<Resource<List<Track>>> = flow {
+    override fun searchTracksRepo(text: String): Resource<List<Track>> {
         val responce = networkClient.doRequest(TrackSearchRequest(text))
-        when (responce.resultCode) {
+        return when (responce.resultCode){
             -1 -> {
-                emit(Resource.Error(context.getString(R.string.problems_with_connection)))
+                Resource.Error(context.getString(R.string.problems_with_connection))
             }
-
             200 -> {
-                emit(Resource.Success(((responce as TrackResponseDto).results.map { trackDto -> trackDto.toTrack() })))
+                Resource.Success(((responce as TrackResponseDto).results.map { trackDto -> trackDto.toTrack() }))
             }
-
             else -> {
-                emit(Resource.Error(context.getString(R.string.nothing_found)))
+                Resource.Error(context.getString(R.string.nothing_found))
             }
         }
 

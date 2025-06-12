@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
-import com.practicum.playlistmaker.library.domain.models.PlaylistFragmentState
+import com.practicum.playlistmaker.library.viewmodel.PlaylistFragmentState
 import com.practicum.playlistmaker.library.viewmodel.PlaylistFragmentViewModel
 import com.practicum.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel

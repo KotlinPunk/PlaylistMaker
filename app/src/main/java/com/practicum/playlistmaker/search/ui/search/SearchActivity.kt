@@ -1,16 +1,14 @@
 package com.practicum.playlistmaker.search.ui.search
 
 import android.content.Context
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -21,42 +19,34 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.FragmentSearchBinding
+import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.player.ui.player.AudioplayerActivity
 import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.search.domain.models.ToastState
-import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.domain.models.TracksState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchTrackViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.getValue
 
-class SearchFragment : Fragment() {
-
-    private var _binding: FragmentSearchBinding? = null
-    private val binding: FragmentSearchBinding get() = requireNotNull(_binding) { "Binding wasn't initiliazed!" }
-
+class SearchActivity : AppCompatActivity(){
     private var saveEditText = ""
 
     private val trackList = ArrayList<Track>()
     private val trackListSearchHistory = ArrayList<Track>()
     private var trackAdapter = TrackAdapter(trackList)
     private val trackAdapterSearchHistory = TrackAdapter(trackListSearchHistory)
+    private val mainThreadHandler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
     private var textWatcher: TextWatcher? = null
-    private var bottomNavigationView: BottomNavigationView? = null
 
     private val viewModel by viewModel<SearchTrackViewModel>()
 
+    private lateinit var arrowbackButton: ImageButton
     private lateinit var inputEditText: EditText
     private lateinit var clearIcon: ImageView
     private lateinit var rvTrackList: RecyclerView
@@ -71,51 +61,42 @@ class SearchFragment : Fragment() {
     private lateinit var searchHistoryRV: RecyclerView
     private lateinit var searchHistoryClearButton: Button
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_search)
 
         val inputMethodManager =
-            requireContext().getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
-        inputEditText = binding.inputEditText
-        clearIcon = binding.clearIcon
-        rvTrackList = binding.rvTrackListXml
-        placeholderLinearLayout = binding.placeholderLinearLayout
-        placeholderErrorImage = binding.placeholderErrorImage
-        placeholderErrorText = binding.placeholderErrorText
-        updateQueryButton = binding.updateQueryButton
-        progressBar = binding.progressBar
+            getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        arrowbackButton = findViewById(R.id.arrowback)
+        inputEditText = findViewById(R.id.inputEditText)
+        clearIcon = findViewById(R.id.clearIcon)
+        rvTrackList = findViewById(R.id.rvTrackListXml)
+        placeholderLinearLayout = findViewById(R.id.placeholderLinearLayout)
+        placeholderErrorImage = findViewById(R.id.placeholderErrorImage)
+        placeholderErrorText = findViewById(R.id.placeholderErrorText)
+        updateQueryButton = findViewById(R.id.updateQueryButton)
+        progressBar = findViewById(R.id.progressBar)
 
-        searchHistoryLayout = binding.searchHistoryLayout
-        searchHistoryText = binding.searchHistoryText
-        searchHistoryRV = binding.searchHistoryRV
-        searchHistoryClearButton = binding.searchHistoryClearButton
+        searchHistoryLayout = findViewById(R.id.searchHistoryLayout)
+        searchHistoryText = findViewById(R.id.searchHistoryText)
+        searchHistoryRV = findViewById(R.id.searchHistoryRV)
+        searchHistoryClearButton = findViewById(R.id.searchHistoryClearButton)
 
         rvTrackList.adapter = trackAdapter
         searchHistoryRV.adapter = trackAdapterSearchHistory
 
-        bottomNavigationView = activity?.findViewById(R.id.bottomNavigationView)
-
-        viewModel.observeState().observe(viewLifecycleOwner) {
+        viewModel.observeState().observe(this) {
             render(it)
         }
 
-        viewModel.observeToastState().observe(viewLifecycleOwner) { toastState ->
+        viewModel.observeToastState().observe(this) { toastState ->
             if (toastState is ToastState.Show) {
                 showToast(toastState.additionalMessage)
                 viewModel.toastWasShown()
             }
         }
 
-        viewModel.observeSearchHistory().observe(viewLifecycleOwner) { history ->
+        viewModel.observeSearchHistory().observe(this) { history ->
             trackListSearchHistory.clear()
             trackListSearchHistory.addAll(history)
             trackAdapterSearchHistory.notifyDataSetChanged()
@@ -138,7 +119,7 @@ class SearchFragment : Fragment() {
                     track.country,
                     track.previewUrl
                 )
-                val audioPlayerIntent = Intent(requireContext(), AudioplayerActivity::class.java)
+                val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
                 audioPlayerIntent.putExtra(TRACK_DATA, trackData)
                 startActivity(audioPlayerIntent)
             }
@@ -160,10 +141,14 @@ class SearchFragment : Fragment() {
                     track.country,
                     track.previewUrl
                 )
-                val audioPlayerIntent = Intent(requireContext(), AudioplayerActivity::class.java)
+                val audioPlayerIntent = Intent(this, AudioplayerActivity::class.java)
                 audioPlayerIntent.putExtra(TRACK_DATA, trackData)
                 startActivity(audioPlayerIntent)
             }
+        }
+
+        arrowbackButton.setOnClickListener {
+            finish()
         }
 
         updateQueryButton.setOnClickListener {
@@ -175,6 +160,7 @@ class SearchFragment : Fragment() {
             trackList.clear()
             trackAdapter.notifyDataSetChanged()
             inputMethodManager?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+
         }
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -228,10 +214,9 @@ class SearchFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onDestroy() {
+        super.onDestroy()
         textWatcher?.let { inputEditText.removeTextChangedListener(it) }
-        _binding = null
     }
 
     private fun clearIconVisibility(s: CharSequence?): Int {
@@ -242,16 +227,15 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun isVisibleKeyboard(view: View?): Boolean {
-        if (view == null) {
-            return false
-        }
-        val inputMethodManager =
-            view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        if (inputMethodManager == null) {
-            return false
-        }
-        return inputMethodManager.isAcceptingText
+    override fun onSaveInstanceState(textwatcher: Bundle) {
+        super.onSaveInstanceState(textwatcher)
+        textwatcher.putString(KEY, saveEditText)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        saveEditText = savedInstanceState.getString(KEY, saveEditText)
+        findViewById<TextView>(R.id.inputEditText).setText(saveEditText)
     }
 
     private fun render(state: TracksState) {
@@ -321,24 +305,21 @@ class SearchFragment : Fragment() {
     }
 
     private fun showToast(additionalMessage: String) {
-        Toast.makeText(requireContext(), additionalMessage, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG).show()
     }
 
     private fun clickDebounce(): Boolean {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            viewLifecycleOwner.lifecycleScope.launch {
-                delay(CLICK_DEBOUNCE_DELAY)
-                isClickAllowed = true
-            }
+            mainThreadHandler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
         }
         return current
     }
 
     companion object {
+        private const val KEY = "Key"
         private const val TRACK_DATA = "track_data"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
-
 }

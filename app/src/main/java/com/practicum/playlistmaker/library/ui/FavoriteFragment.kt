@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.databinding.FragmentFavoritesBinding
-import com.practicum.playlistmaker.library.domain.models.FavoriteFragmentState
+import com.practicum.playlistmaker.library.viewmodel.FavoriteFragmentState
 import com.practicum.playlistmaker.library.viewmodel.FavoriteFragmentViewModel
 import com.practicum.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
