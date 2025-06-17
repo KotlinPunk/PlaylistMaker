@@ -1,9 +1,11 @@
 package com.practicum.playlistmaker.di
 
 import android.content.Context
-import android.content.SharedPreferences
+import android.util.Log
+import androidx.room.Room
 import com.google.gson.Gson
 import com.practicum.playlistmaker.search.data.NetworkClient
+import com.practicum.playlistmaker.search.data.db.AppDatabase
 import com.practicum.playlistmaker.search.data.impl.storage.SearchHistoryImpl
 import com.practicum.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.practicum.playlistmaker.search.data.network.TrackApi
@@ -13,7 +15,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import kotlin.math.sin
 
 val dataModule = module {
 
@@ -26,22 +27,33 @@ val dataModule = module {
             .create(TrackApi::class.java)
     }
 
-    single {
-        androidContext().getSharedPreferences("local_storage", Context.MODE_PRIVATE)
+    single<NetworkClient> {
+        RetrofitNetworkClient(androidContext(), get())
     }
 
     single { Gson() }
 
     single {
-        SearchHistoryImpl(get(), get())
+        androidContext().getSharedPreferences("local_storage", Context.MODE_PRIVATE)
     }
 
-    single<NetworkClient> {
-        RetrofitNetworkClient(androidContext(), get())
+    single {
+        SearchHistoryImpl(get(), get())
     }
 
     //sharing
     single<Navigator> {
         NavigatorImpl(androidContext())
+    }
+
+    //db
+    single {
+        try {
+            Log.d("Koin", "Creating AppDatabase")
+            Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db").build()
+        } catch (e: Exception) {
+            Log.e("Koin", "Error creating AppDatabase: ", e)
+            throw e
+        }
     }
 }

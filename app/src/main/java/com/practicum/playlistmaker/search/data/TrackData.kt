@@ -18,7 +18,8 @@ data class TrackData(
     override val releaseDate: String,
     override val primaryGenreName: String,
     override val country: String,
-    override val previewUrl: String?
+    override val previewUrl: String?,
+    var isFavorite: Boolean
 ) : Parcelable, TrackInterface {
 
     override fun getCoverArtwork() = artworkUrl100.replaceAfterLast('/', "512x512bb.jpg")
