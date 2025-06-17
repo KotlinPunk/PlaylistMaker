@@ -35,7 +35,7 @@ class AudioplayerActivity : AppCompatActivity() {
 
         val track: Track? = trackData?.toTrack()
         track?.let {
-            viewModel.setPreviewUrl(it.previewUrl)
+            viewModel.setTrack(it)
             with(binding) {
                 nameTrackData.text = track.trackName
                 singerTrackData.text = track.artistName
@@ -65,12 +65,21 @@ class AudioplayerActivity : AppCompatActivity() {
                     .into(placeholderTrack)
             }
         }
+
         viewModel.playerState.observe(this) { state ->
             updatePlayerState(state)
         }
 
         viewModel.currentTime.observe(this) { time ->
             binding.timePlayTrack.text = time
+        }
+
+        viewModel.isFavorite.observe(this) { isFavorite ->
+            updateButtonFavorite(isFavorite)
+        }
+
+        binding.favoriteTrack.setOnClickListener {
+            viewModel.onFavoriteClicked()
         }
 
         binding.playTrack.setOnClickListener {
@@ -80,6 +89,16 @@ class AudioplayerActivity : AppCompatActivity() {
         binding.arrowback.setOnClickListener {
             finish()
         }
+    }
+
+    private fun updateButtonFavorite(isFavorite: Boolean) {
+        binding.favoriteTrack.setImageResource(
+            if (isFavorite) {
+                R.drawable.ic_favorite_track_button_on
+            } else {
+                R.drawable.ic_favorite_track_button
+            }
+        )
     }
 
     private fun updatePlayerState(state: AudioplayerState) {

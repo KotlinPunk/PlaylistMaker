@@ -104,7 +104,7 @@ class SearchFragment : Fragment() {
 
         bottomNavigationView = activity?.findViewById(R.id.bottomNavigationView)
 
-        viewModel.observeState().observe(viewLifecycleOwner) {
+        viewModel.stateLiveData.observe(viewLifecycleOwner) {
             render(it)
         }
 
@@ -114,13 +114,6 @@ class SearchFragment : Fragment() {
                 viewModel.toastWasShown()
             }
         }
-
-        viewModel.observeSearchHistory().observe(viewLifecycleOwner) { history ->
-            trackListSearchHistory.clear()
-            trackListSearchHistory.addAll(history)
-            trackAdapterSearchHistory.notifyDataSetChanged()
-            searchHistoryLayout.isVisible = history.isNotEmpty()
-        } // теперь тут слушаем измнения в истории списка
 
         trackAdapter.onClickTrack = { track: Track ->
             if (clickDebounce()) {
@@ -136,7 +129,8 @@ class SearchFragment : Fragment() {
                     track.releaseDate,
                     track.primaryGenreName,
                     track.country,
-                    track.previewUrl
+                    track.previewUrl,
+                    track.isFavorite
                 )
                 val audioPlayerIntent = Intent(requireContext(), AudioplayerActivity::class.java)
                 audioPlayerIntent.putExtra(TRACK_DATA, trackData)
@@ -158,7 +152,8 @@ class SearchFragment : Fragment() {
                     track.releaseDate,
                     track.primaryGenreName,
                     track.country,
-                    track.previewUrl
+                    track.previewUrl,
+                    track.isFavorite
                 )
                 val audioPlayerIntent = Intent(requireContext(), AudioplayerActivity::class.java)
                 audioPlayerIntent.putExtra(TRACK_DATA, trackData)
@@ -242,18 +237,6 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun isVisibleKeyboard(view: View?): Boolean {
-        if (view == null) {
-            return false
-        }
-        val inputMethodManager =
-            view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        if (inputMethodManager == null) {
-            return false
-        }
-        return inputMethodManager.isAcceptingText
-    }
-
     private fun render(state: TracksState) {
         when (state) {
             is TracksState.Loading -> showLoading()
@@ -261,7 +244,7 @@ class SearchFragment : Fragment() {
             is TracksState.Content -> showContent(state.trackL)
             is TracksState.Error -> showError(state.errorMessage)
             is TracksState.EmptyList -> showEmptyList(state.message)
-            is TracksState.EmptyInputShowHistory -> showSearchHistory()
+            is TracksState.EmptyInputShowHistory -> showSearchHistory(state.history)
         }
     }
 
@@ -313,11 +296,20 @@ class SearchFragment : Fragment() {
         updateQueryButton.isVisible = false
     }
 
-    fun showSearchHistory() {
+    fun showSearchHistory(history: List<Track>) {
         rvTrackList.isVisible = false
         placeholderLinearLayout.isVisible = false
         progressBar.isVisible = false
         searchHistoryLayout.isVisible = true
+
+        if (history.isNotEmpty()) { // теперь тут слушаем измнения в истории списка
+            trackListSearchHistory.clear()
+            trackListSearchHistory.addAll(history)
+            trackAdapterSearchHistory.notifyDataSetChanged()
+            searchHistoryLayout.isVisible = true
+        } else {
+            searchHistoryLayout.isVisible = false
+        }
     }
 
     private fun showToast(additionalMessage: String) {

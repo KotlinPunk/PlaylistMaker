@@ -1,7 +1,12 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.android") version "1.9.22"
     id("kotlin-parcelize")
+    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
+}
+
+object Versions {
+    const val roomVersion = "2.5.1"
 }
 
 android {
@@ -51,20 +56,27 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-    /*implementation("com.github.bumptech.glide:glide:4.14.2")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.14.2")*/
-
     implementation("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
 
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    implementation ("io.insert-koin:koin-android:3.3.0")
+    implementation("io.insert-koin:koin-android:3.5.3")
 
     implementation ("androidx.navigation:navigation-fragment-ktx:2.5.3")
     implementation ("androidx.navigation:navigation-ui-ktx:2.5.3")
     implementation ("androidx.fragment:fragment-ktx:1.5.6")
 
     implementation ("com.google.android.material:material:1.8.0")
+
+    implementation("androidx.room:room-runtime:${Versions.roomVersion}")
+    ksp("androidx.room:room-compiler:${Versions.roomVersion}")
+    implementation("androidx.room:room-ktx:${Versions.roomVersion}")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    /*implementation("com.google.dagger:dagger-compiler:2.51.1")*/
+    ksp("com.google.dagger:dagger-compiler:2.51.1")
+
 }

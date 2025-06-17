@@ -33,7 +33,11 @@
         android:id="@+id/favoriteFragment"
         android:name="com.practicum.playlistmaker.library.ui.FavoriteFragment"
         android:label="FavoriteFragment"
-        tools:layout="@layout/fragment_favorites" />
+        tools:layout="@layout/fragment_favorites">
+        <action
+            android:id="@+id/action_searchFragment_to_audioplayerActivity"
+            app:destination="@id/audioplayerActivity" />
+    </fragment>
     <fragment
         android:id="@+id/playlistFragment"
         android:name="com.practicum.playlistmaker.library.ui.PlaylistFragment"

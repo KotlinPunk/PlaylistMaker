@@ -5,19 +5,22 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.library.domain.api.intr.LibraryDbInteractor
 import com.practicum.playlistmaker.player.domain.api.intr.AudioPlayerInteractor
 import com.practicum.playlistmaker.player.domain.models.AudioplayerState
+import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AudioPlayerViewModel(
     application: Application,
-    private val mediaPlayerInteractor: AudioPlayerInteractor
+    private val mediaPlayerInteractor: AudioPlayerInteractor,
+    private val libraryDbInteractor: LibraryDbInteractor
 ) : AndroidViewModel(application) {
 
     private var timerJob: Job? = null
-    private var currentPreviewUrl: String? = null
+    private var currentTrack: Track? = null //храним текущий трек
 
     private val _playerState = MutableLiveData<AudioplayerState>(AudioplayerState.State_default)
     val playerState: LiveData<AudioplayerState> = _playerState
@@ -28,10 +31,36 @@ class AudioPlayerViewModel(
     private val _previewUrl = MutableLiveData<String?>()
     val previewUrl: LiveData<String?> = _previewUrl
 
-    fun setPreviewUrl(url: String?) {
-        _previewUrl.value = url
-        currentPreviewUrl = url //сохранили адрес
-        preparePlayerVM(url)
+    private val _isFavorite = MutableLiveData<Boolean>(false)
+    val isFavorite: LiveData<Boolean> = _isFavorite
+
+    fun setTrack(track: Track) { // метод для установки текущего треки и инициализации _isFavorite начальным значением
+        currentTrack = track.copy() // для создания новой копии Track с изменённым isFavorite
+        viewModelScope.launch {
+            _isFavorite.postValue(libraryDbInteractor.isTrackInFavorites(track.trackId))
+        }
+        _previewUrl.value = track.previewUrl
+        preparePlayerVM(track.previewUrl)
+    }
+
+    fun onFavoriteClicked() {
+        currentTrack?.let { track ->
+            viewModelScope.launch {
+                try {
+                    val isCurrentlyFavorite = libraryDbInteractor.isTrackInFavorites(track.trackId)
+
+                    if (isCurrentlyFavorite) {
+                        libraryDbInteractor.deleteTrackFromFavoriteIntr(track)
+                    } else {
+
+                        libraryDbInteractor.insertTrackToFavoriteIntr(track)
+                    }
+                    _isFavorite.postValue(!isCurrentlyFavorite)
+                } catch (e: Exception) {
+                    // Обработка ошибки
+                }
+            }
+        }
     }
 
     private fun preparePlayerVM(previewUrl: String?) {
@@ -77,11 +106,7 @@ class AudioPlayerViewModel(
     fun playbackControl() {
         when (playerState.value) {
             AudioplayerState.State_default, AudioplayerState.State_completed -> {
-                if (_previewUrl.value != currentPreviewUrl){     // доп проверка для подготовки плеера
-                    _previewUrl.value?.let { preparePlayerVM(it) }
-                } else {
-                    startPlayerVM()
-                }
+                startPlayerVM()
             }
 
             AudioplayerState.State_prepared -> startPlayerVM()

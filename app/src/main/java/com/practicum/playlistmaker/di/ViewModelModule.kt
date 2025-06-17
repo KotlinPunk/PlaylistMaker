@@ -6,6 +6,7 @@ import com.practicum.playlistmaker.player.ui.viewmodel.AudioPlayerViewModel
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchTrackViewModel
 import com.practicum.playlistmaker.settings.ui.viewmodel.SettingsViewModel
 import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -13,12 +14,12 @@ val viewModelModule = module {
 
     //search
     viewModel {
-        SearchTrackViewModel(androidApplication(), get(), get())
+        SearchTrackViewModel(androidApplication(), get(), get(), get())
     }
 
     //player
     viewModel {
-        AudioPlayerViewModel(androidApplication(), get())
+        AudioPlayerViewModel(androidApplication(), get(), get())
     }
 
     //settings
@@ -27,12 +28,12 @@ val viewModelModule = module {
     }
 
     //favoritefragment
-    viewModel{
-        FavoriteFragmentViewModel()
+    viewModel {
+        FavoriteFragmentViewModel(androidContext(), get())
     }
 
     //playlistfragment
-    viewModel{
+    viewModel {
         PlaylistFragmentViewModel()
     }
 }

@@ -1,13 +1,13 @@
 package com.practicum.playlistmaker.search.ui.viewmodel
 
 import android.app.Application
-import android.os.Handler
-import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.library.domain.api.intr.LibraryDbInteractor
 import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.search.domain.api.intr.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.domain.api.intr.SearchTracksInteractor
@@ -17,35 +17,46 @@ import com.practicum.playlistmaker.search.domain.models.TracksState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.collections.addAll
-import kotlin.text.clear
 
 class SearchTrackViewModel(
     application: Application,
     private val searchTracksInteractor: SearchTracksInteractor,
-    private val historyInteractor: SearchHistoryInteractor
+    private val historyInteractor: SearchHistoryInteractor,
+    private val libraryDbInteractor: LibraryDbInteractor
 ) : AndroidViewModel(application) {
 
     private val trackList: MutableList<Track> = ArrayList()
     private var latestSearchText: String? = null
     private var searchJob: Job? = null
 
-    private val stateLiveData = MutableLiveData<TracksState>()
-    fun observeState(): LiveData<TracksState> = stateLiveData
+    private val _stateLiveData = MutableLiveData<TracksState>()
+    val stateLiveData: LiveData<TracksState> = _stateLiveData
 
     private val toastState = MutableLiveData<ToastState>(ToastState.None)
     fun observeToastState(): LiveData<ToastState> = toastState
-
-    private val searchHistoryLiveData = MutableLiveData<List<Track>>()
-    fun observeSearchHistory(): LiveData<List<Track>> = searchHistoryLiveData
 
     init {
         loadSearchHistory() // как только создаём viewvodel сразу загружаем историю поиска
     }
 
-    // функция для загрузки истории поиска
     fun loadSearchHistory() {
-        searchHistoryLiveData.value = historyInteractor.getTrackHistoryIntr()
+        viewModelScope.launch {
+            try {
+                val tracks = historyInteractor.getTrackHistoryIntr()
+                val updateTracks = tracks.map { track ->
+                    checkIfTrackIsFavorite(track)
+                }
+                renderState(TracksState.Content(updateTracks))
+            } catch (e: Exception) {
+                Log.e("SearchTrackViewModel", "Ошибка при выборке истории поиска", e)
+                renderState(TracksState.Error("Ошибка при выборке истории поиска"))
+            }
+        }
+    }
+
+    private suspend fun checkIfTrackIsFavorite(track: Track): Track {
+        val isFavorite = libraryDbInteractor.isTrackInFavorites(track.trackId)
+        return track.copy(isFavorite = isFavorite)
     }
 
     fun searchDebounce(changedText: String) {
@@ -59,17 +70,16 @@ class SearchTrackViewModel(
             val newSearchText = latestSearchText ?: ""
             getTrack(newSearchText)
         }
-
     }
 
     private fun renderState(state: TracksState) {
-        stateLiveData.postValue(state)
+        _stateLiveData.postValue(state)
     }
 
     fun searchHistoryOrAllHide() {
         val historyList = historyInteractor.getTrackHistoryIntr()
         if (historyList.isNotEmpty()) {
-            renderState(TracksState.EmptyInputShowHistory)
+            renderState(TracksState.EmptyInputShowHistory(historyList))
         } else {
             renderState(TracksState.EmptyAll)
         }
@@ -87,7 +97,8 @@ class SearchTrackViewModel(
             track.releaseDate,
             track.primaryGenreName,
             track.country,
-            track.previewUrl
+            track.previewUrl,
+            track.isFavorite
         )
         historyInteractor.addTrackToHistoryIntr(trackData)
         loadSearchHistory() // как добавили, сразу обновили LiveData
