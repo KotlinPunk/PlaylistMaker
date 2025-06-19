@@ -4,7 +4,7 @@ import com.practicum.playlistmaker.search.domain.models.Track
 
 sealed interface PlaylistFragmentState {
     data class Content(
-        val playlistTracks: List<List<Track>>
+        val playlistTracks: List<Playlist>
     ) : PlaylistFragmentState
 
     data class Error(

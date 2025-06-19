@@ -8,13 +8,13 @@
     tools:context="com.practicum.playlistmaker.library.ui.PlaylistFragment">
 
     <Button
-        android:id="@+id/newPlaylist"
+        android:id="@+id/newPlaylistButton"
         style="@style/ButtonStyleActivitySettings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/one_hundred_twenty_eight_dp"
+        android:layout_marginTop="@dimen/twenty_four_dp"
         android:text="@string/new_playlist"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,12 +24,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/two_hundred_twelve_dp"
+        android:layout_marginTop="@dimen/forty_four_dp"
         android:src="@drawable/error_search"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/newPlaylistButton" />
 
     <TextView
         android:id="@+id/placeholderErrorTextFragment"
@@ -45,7 +45,7 @@
         android:textColor="@color/day_dark_and_night_white"
         android:textFontWeight="400"
         android:textSize="@dimen/nineteen_sp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/placeholderErrorImageFragment" />

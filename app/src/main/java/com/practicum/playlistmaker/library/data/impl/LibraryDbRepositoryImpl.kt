@@ -20,22 +20,17 @@ class LibraryDbRepositoryImpl(
     }
 
     override suspend fun insertTrackToFavoriteRepo(track: Track) {
-        Log.d("LibraryDbRepositoryImpl", "Inserting track: ${track.trackId}")
         val trackEntity = trackToTrackEntity(track)
         appDatabase.trackDao().insertTrackToFavorite(trackEntity)
-        Log.d("LibraryDbRepositoryImpl", "Track inserted: ${track.trackId}")
     }
 
     override suspend fun deleteTrackFromFavoriteRepo(track: Track) {
-        Log.d("LibraryDbRepositoryImpl", "Deleting track: ${track.trackId}")
         val trackEntity = trackToTrackEntity(track)
         appDatabase.trackDao().deleteTrackFromFavorite(trackEntity)
-        Log.d("LibraryDbRepositoryImpl", "Track deleted: ${track.trackId}")
     }
 
     override suspend fun isTrackInFavorites(trackId: Int): Boolean {
         val isInFavorites = appDatabase.trackDao().isTrackInFavorites(trackId)
-        Log.d("LibraryDbRepositoryImpl", "isTrackInFavorites called for trackId: $trackId, result: $isInFavorites")
         return isInFavorites
     }
 

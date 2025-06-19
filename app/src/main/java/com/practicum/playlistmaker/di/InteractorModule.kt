@@ -1,7 +1,9 @@
 package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.library.domain.api.intr.LibraryDbInteractor
+import com.practicum.playlistmaker.library.domain.api.intr.PlaylistInteractor
 import com.practicum.playlistmaker.library.domain.impl.LibraryDbInteractorImpl
+import com.practicum.playlistmaker.library.domain.impl.PlaylistInteractorImpl
 import com.practicum.playlistmaker.player.domain.api.intr.AudioPlayerInteractor
 import com.practicum.playlistmaker.player.domain.impl.AudioPlayerInteractorImpl
 import com.practicum.playlistmaker.search.domain.api.intr.SearchHistoryInteractor
@@ -31,4 +33,5 @@ val interactorModule = module {
 
     //library
     single<LibraryDbInteractor> { LibraryDbInteractorImpl(get()) }
+    single<PlaylistInteractor> { PlaylistInteractorImpl(get()) }
 }

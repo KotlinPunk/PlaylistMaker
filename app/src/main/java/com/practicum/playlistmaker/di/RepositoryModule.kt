@@ -1,9 +1,12 @@
 package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.library.data.impl.LibraryDbRepositoryImpl
+import com.practicum.playlistmaker.library.data.impl.PlaylistRepositoryImpl
 import com.practicum.playlistmaker.library.domain.api.repo.LibraryDbRepository
+import com.practicum.playlistmaker.library.domain.api.repo.PlaylistRepository
 import com.practicum.playlistmaker.player.data.impl.AudioPlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.api.repo.AudioPlayerRepository
+import com.practicum.playlistmaker.search.data.PlaylistDbConvertor
 import com.practicum.playlistmaker.search.data.TrackDbConvertor
 import com.practicum.playlistmaker.search.data.impl.TracksRepositoryImpl
 import com.practicum.playlistmaker.search.domain.api.repo.TracksRepository
@@ -38,9 +41,13 @@ val repositoryModule = module {
 
     //convector
     factory< TrackDbConvertor > { TrackDbConvertor() }
+    factory< PlaylistDbConvertor > { PlaylistDbConvertor() }
 
     //library
     single<LibraryDbRepository> {
         LibraryDbRepositoryImpl(get(), get())
+    }
+    single<PlaylistRepository> {
+        PlaylistRepositoryImpl(get(), get())
     }
 }
