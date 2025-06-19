@@ -27,6 +27,7 @@ import com.practicum.playlistmaker.library.viewmodel.NewPlaylistFragmentViewMode
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.search.domain.models.ToastState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -72,22 +73,6 @@ class NewPlaylistFragment : Fragment() {
             }
             binding.newPlaylistButton.backgroundTintList = ColorStateList.valueOf(color)
             binding.newPlaylistButton.isEnabled = state.isSaveButtinEnabled
-
-            if (state.saveResult != null) {
-                Toast.makeText(
-                    requireContext(),
-                    "Плейлист ${state.namePL} создан",
-                    Toast.LENGTH_LONG
-                ).show()
-                findNavController().popBackStack()
-            }
-            if (state.saveError != null) {
-                Toast.makeText(
-                    requireContext(),
-                    "Ошибка при сохранении",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
         }
 
         val pickMedia =
@@ -107,6 +92,14 @@ class NewPlaylistFragment : Fragment() {
 
         binding.newPlaylistButton.setOnClickListener {
             viewModel.savePlaylist()
+            findNavController().popBackStack()
+        }
+
+        viewModel.toastState.observe(viewLifecycleOwner) { toastState ->
+            if (toastState is ToastState.Show) {
+                showToast(toastState.additionalMessage)
+                viewModel.toastWasShown()
+            }
         }
 
         binding.inputNameNewPL.addTextChangedListener(object : TextWatcher {
@@ -226,6 +219,10 @@ class NewPlaylistFragment : Fragment() {
                 findNavController().popBackStack()
             }
             .show()
+    }
+
+    private fun showToast(additionalMessage: String) {
+        Toast.makeText(requireContext(), additionalMessage, Toast.LENGTH_LONG).show()
     }
 }
 

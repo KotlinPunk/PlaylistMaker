@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.Flow
 interface PlaylistRepository {
 
     suspend fun insertPlaylistRepo(playlist: Playlist): Long
-    /*suspend fun updatePlaylistRepo(playlist: Playlist)*/
-    suspend fun getAllPlaylistsRepo(): Flow<List<Playlist>>
+    suspend fun updatePlaylistRepo(playlist: Playlist)
+    fun getAllPlaylistsRepo(): Flow<List<Playlist>>
 }

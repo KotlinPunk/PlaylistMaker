@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.library.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,14 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.practicum.playlistmaker.R
 import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
 import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.library.domain.models.PlaylistFragmentState
 import com.practicum.playlistmaker.library.viewmodel.PlaylistFragmentViewModel
-import com.practicum.playlistmaker.player.ui.player.AudioplayerActivity
-import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.String
 import kotlin.collections.List
@@ -25,6 +25,9 @@ class PlaylistFragment : Fragment() {
     private var _binding: FragmentPlaylistBinding? = null
     private val binding: FragmentPlaylistBinding get() = requireNotNull(_binding) { "Binding wasn't initiliazed!" }
     private val viewModel by viewModel<PlaylistFragmentViewModel>()
+    private var adapter: PlaylistAdapter? = null
+    private val playlists = ArrayList<Playlist>()
+    private var isClickAllowed = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,15 +41,13 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        adapter = PlaylistAdapter(playlists)
+        binding.playlistRV.adapter = adapter
 
         binding.newPlaylistButton.setOnClickListener {
-            Log.d("PlaylistFragment", "Button clicked, navigating to NewPlaylistFragment")
             val navController = findNavController()
             navController.navigate(R.id.action_mediaLibraryFragment_to_newPlaylistFragment2)
-            Log.d("PlaylistFragment", "Navigation completed")
         }
-
-
 
         viewModel.stateLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -54,20 +55,54 @@ class PlaylistFragment : Fragment() {
                 is PlaylistFragmentState.Error -> showErrorMessage(state.message)
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch { // обновляем список плейлистов
+            viewModel.updatePlaylistsFlow.collect {
+                viewModel.fillData()
+            }
+        }
     }
 
     private fun showPlaylistTracks(favTracks: List<Playlist>) {
-        TODO("Not yet implemented")
+        Log.d("PlaylistFragment", "showPlaylistTracks called with ${favTracks.size} tracks")
+        binding.newPlaylistButton.isVisible = true
+        binding.placeholderErrorImageFragment.isVisible = false
+        binding.placeholderErrorTextFragment.isVisible = false
+        binding.playlistRV.isVisible = true
+        binding.playlistScroll.isVisible = true
+
+        playlists.clear()
+        playlists.addAll(favTracks)
+        adapter?.notifyDataSetChanged()
+        Log.d("PlaylistFragment", "Adapter notified of data change")
     }
 
     private fun showErrorMessage(errorMessage: String) {
         binding.newPlaylistButton.isVisible = true
         binding.placeholderErrorImageFragment.isVisible = true
         binding.placeholderErrorTextFragment.isVisible = true
+        binding.playlistRV.isVisible = false
         binding.placeholderErrorTextFragment.text = errorMessage
+    }
+
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
+        }
+        return current
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
         fun newInstance() = PlaylistFragment()
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }

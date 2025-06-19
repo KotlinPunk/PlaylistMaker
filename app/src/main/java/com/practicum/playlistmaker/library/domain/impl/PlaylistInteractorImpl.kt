@@ -10,7 +10,11 @@ class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository)
         return playlistRepository.insertPlaylistRepo(playlist)
     }
 
-    override suspend fun getAllPlaylistsIntr(): Flow<List<Playlist>> {
+    override suspend fun updatePlaylistIntr(playlist: Playlist) {
+        playlistRepository.updatePlaylistRepo(playlist)
+    }
+
+    override fun getAllPlaylistsIntr(): Flow<List<Playlist>> {
         return playlistRepository.getAllPlaylistsRepo()
     }
 }

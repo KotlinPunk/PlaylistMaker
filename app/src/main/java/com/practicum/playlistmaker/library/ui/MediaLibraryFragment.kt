@@ -29,6 +29,7 @@ class MediaLibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.viewPager.offscreenPageLimit = 1
         binding.viewPager.adapter =
             LibraryViewPagerAdapter(fragmentManager = childFragmentManager, lifecycle = lifecycle)
 
