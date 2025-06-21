@@ -13,7 +13,7 @@ data class TrackData(
     override val artistName: String,
     override val trackTimeMillis: Long,
     override val artworkUrl100: String,
-    override val trackId: Int,
+    override val trackId: Long,
     override val collectionName: String?,
     override val releaseDate: String,
     override val primaryGenreName: String,

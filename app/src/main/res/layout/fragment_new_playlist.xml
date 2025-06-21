@@ -1,8 +1,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/newPlaylistFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/day_white_and_night_dark"
     tools:context="com.practicum.playlistmaker.library.ui.NewPlaylistFragment">
 
@@ -60,49 +61,61 @@
             android:src="@drawable/ic_playlist" />
     </FrameLayout>
 
-    <FrameLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/nameNewPL"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="@dimen/fifty_six"
         android:layout_marginTop="@dimen/thirty_two_dp"
+        android:hint="@string/name_playlist"
         android:paddingHorizontal="@dimen/sixteen_dp"
+        app:boxBackgroundMode="outline"
+        app:boxStrokeColor="@color/color_hint_off"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="1dp"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        app:hintTextColor="@color/blue"
         app:layout_constraintBottom_toTopOf="@id/descriptionNewPL"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/frameGapImageNewPL">
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputNameNewPL"
             style="@style/EditTextNewPL"
-            android:hint="@string/name_playlist" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        <ImageButton
-            android:id="@+id/clearNameNewPL"
-            style="@style/ClearImageButtonStyle"
-            android:visibility="gone" />
-    </FrameLayout>
-
-    <FrameLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/descriptionNewPL"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="@dimen/fifty_six"
         android:layout_marginTop="@dimen/sixteen_dp"
+        android:hint="@string/description_playlist"
         android:paddingHorizontal="@dimen/sixteen_dp"
+        app:boxBackgroundMode="outline"
+        app:boxStrokeColor="@color/color_hint_off"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="1dp"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        app:hintTextColor="@color/blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nameNewPL">
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputDescriptionNewPL"
             style="@style/EditTextNewPL"
-            android:hint="@string/description_playlist" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text" />
 
-        <ImageButton
-            android:id="@+id/clearDescriptionNewPL"
-            style="@style/ClearImageButtonStyle"
-            android:visibility="gone" />
-    </FrameLayout>
-
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/newPlaylistButton"
@@ -114,5 +127,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

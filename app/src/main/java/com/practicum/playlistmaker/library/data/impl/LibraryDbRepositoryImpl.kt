@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.library.data.impl
 
-import android.util.Log
 import com.practicum.playlistmaker.library.domain.api.repo.LibraryDbRepository
 import com.practicum.playlistmaker.search.data.TrackDbConvertor
 import com.practicum.playlistmaker.search.data.db.AppDatabase
@@ -29,7 +28,7 @@ class LibraryDbRepositoryImpl(
         appDatabase.trackDao().deleteTrackFromFavorite(trackEntity)
     }
 
-    override suspend fun isTrackInFavorites(trackId: Int): Boolean {
+    override suspend fun isTrackInFavorites(trackId: Long): Boolean {
         val isInFavorites = appDatabase.trackDao().isTrackInFavorites(trackId)
         return isInFavorites
     }

@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.di
 
+import com.google.gson.Gson
 import com.practicum.playlistmaker.library.data.impl.LibraryDbRepositoryImpl
 import com.practicum.playlistmaker.library.data.impl.PlaylistRepositoryImpl
 import com.practicum.playlistmaker.library.domain.api.repo.LibraryDbRepository
@@ -48,6 +49,6 @@ val repositoryModule = module {
         LibraryDbRepositoryImpl(get(), get())
     }
     single<PlaylistRepository> {
-        PlaylistRepositoryImpl(get(), get())
+        PlaylistRepositoryImpl(get(), get(), Gson())
     }
 }

@@ -7,5 +7,5 @@ interface LibraryDbInteractor {
     suspend fun getTracksFromFavoriteIntr(): Flow<List<Track>>
     suspend fun insertTrackToFavoriteIntr(track: Track)
     suspend fun deleteTrackFromFavoriteIntr(track: Track)
-    suspend fun isTrackInFavorites(trackId: Int): Boolean
+    suspend fun isTrackInFavorites(trackId: Long): Boolean
 }

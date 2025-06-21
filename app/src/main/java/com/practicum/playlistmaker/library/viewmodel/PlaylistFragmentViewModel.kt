@@ -38,13 +38,6 @@ class PlaylistFragmentViewModel(
         }
     }
 
-    /*fun updatePlaylist(playlist: Playlist) {
-        viewModelScope.launch {
-            playlistInteractor.updatePlaylistIntr(playlist)
-            _updatePlaylistsFlow.emit(Unit)
-        }
-    }*/
-
     private fun processResult(playlists: List<Playlist>) {
         Log.d("PlaylistFragment", "Received playlists: ${playlists.size}")
         if (playlists.isEmpty()) {

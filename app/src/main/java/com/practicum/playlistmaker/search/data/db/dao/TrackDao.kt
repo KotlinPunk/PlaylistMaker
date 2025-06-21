@@ -19,8 +19,8 @@ interface TrackDao {
     suspend fun getTracksFromFavorite(): List<TrackEntity>
 
     @Query("SELECT trackId FROM track_table")
-    suspend fun getTracksIdFromFavorite(): List<Int>
+    suspend fun getTracksIdFromFavorite(): List<Long>
 
     @Query("SELECT EXISTS(SELECT 1 FROM track_table WHERE trackId = :trackId)") // интересует только лишь наличие хотя бы одной строки
-    suspend fun isTrackInFavorites(trackId: Int): Boolean // true - строка есть, иначе false
+    suspend fun isTrackInFavorites(trackId: Long): Boolean // true - строка есть, иначе false
 }

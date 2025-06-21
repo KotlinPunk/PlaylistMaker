@@ -6,18 +6,18 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.practicum.playlistmaker.library.domain.api.intr.LibraryDbInteractor
 import com.practicum.playlistmaker.library.domain.api.intr.PlaylistInteractor
 import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.library.domain.models.PlaylistFragmentState
 import com.practicum.playlistmaker.player.domain.api.intr.AudioPlayerInteractor
 import com.practicum.playlistmaker.player.domain.models.AudioplayerState
+import com.practicum.playlistmaker.player.domain.models.PlaylistStateInPlayer
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -25,7 +25,8 @@ class AudioPlayerViewModel(
     application: Application,
     private val mediaPlayerInteractor: AudioPlayerInteractor,
     private val libraryDbInteractor: LibraryDbInteractor,
-    private val playlistInteractor: PlaylistInteractor
+    private val playlistInteractor: PlaylistInteractor,
+    private val gson: Gson = Gson()
 ) : AndroidViewModel(application) {
 
     private var timerJob: Job? = null
@@ -45,6 +46,9 @@ class AudioPlayerViewModel(
 
     private val _stateLiveDataPL = MutableLiveData<PlaylistFragmentState>()
     val stateLiveDataPL: LiveData<PlaylistFragmentState> = _stateLiveDataPL
+
+    private val _statePLInPlayer = MutableLiveData<PlaylistStateInPlayer>()
+    val statePLInPlayer: LiveData<PlaylistStateInPlayer> = _statePLInPlayer
 
 
     fun setTrack(track: Track) { // метод для установки текущего треки и инициализации _isFavorite начальным значением
@@ -76,26 +80,6 @@ class AudioPlayerViewModel(
         }
     }
 
-
-    /* fun getPlaylists(){
-         viewModelScope.launch{
-             withContext(Dispatchers.IO){
-                 playlistInteractor
-                     .getAllPlaylistsIntr()
-                     .collect {
-                         if(it.isEmpty())
-                             _stateLiveDataPL.postValue(PlaylistFragmentState.Error(""))
-                         else
-                             _stateLiveDataPL.postValue(PlaylistFragmentState.Content(it))
-                     }
-             }
-         }
-     }
- */
-    /* suspend fun getAllPlaylists(): List<Playlist> {
-         return playlistInteractor.getAllPlaylistsIntr().first() // сразу превращаем первый эелмент потока в List<Playlist>
-     }*/
-
     fun fillDataPL() {
         Log.d("AudioVM", "Beg")
         viewModelScope.launch {
@@ -121,6 +105,25 @@ class AudioPlayerViewModel(
         _stateLiveDataPL.postValue(state)
     }
 
+    fun addTrackToPlaylist(track: Track, playlist: Playlist) {
+        Log.d("AudioVM", "Beg")
+        viewModelScope.launch {
+            Log.d("AudioVM", "Ing")
+            val isInPlaylist = withContext(Dispatchers.IO) {
+                val trackIds = playlist.trackIds?.fromJson(gson) ?: emptyList()
+                trackIds.contains(track.trackId)
+            }
+            if (!isInPlaylist) {
+                playlistInteractor.addTrackToPlaylistIntr(track, playlist)
+                _statePLInPlayer.postValue(PlaylistStateInPlayer.AddedToPlaylist(playlist.playlistName))
+            } else {
+                _statePLInPlayer.postValue(PlaylistStateInPlayer.PresentInPlaylist(playlist.playlistName))
+            }
+        }
+    }
+
+    private fun String?.fromJson(gson: Gson): List<Long> =
+        this?.let { gson.fromJson(it, Array<Long>::class.java)?.toList() } ?: emptyList()
 
     private fun preparePlayerVM(previewUrl: String?) {
         if (previewUrl == null) return // проверили на null
@@ -134,7 +137,6 @@ class AudioPlayerViewModel(
             }
         )
     }
-
 
     fun startPlayerVM() {
         _playerState.value = AudioplayerState.State_playing

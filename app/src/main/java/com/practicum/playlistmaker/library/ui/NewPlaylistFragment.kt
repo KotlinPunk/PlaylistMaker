@@ -1,6 +1,6 @@
 package com.practicum.playlistmaker.library.ui
 
-import android.content.Context.INPUT_METHOD_SERVICE
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
@@ -10,23 +10,28 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.practicum.playlistmaker.databinding.FragmentNewPlaylistBinding
 import com.practicum.playlistmaker.library.viewmodel.NewPlaylistFragmentViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.root.RootActivity
 import com.practicum.playlistmaker.search.domain.models.ToastState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,9 +58,6 @@ class NewPlaylistFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val inputMethodManager =
-            requireContext().getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
 
         viewModel.stateLiveData.observe(viewLifecycleOwner) { state ->
             // обновили ui в зависимости от состояния
@@ -92,14 +94,9 @@ class NewPlaylistFragment : Fragment() {
 
         binding.newPlaylistButton.setOnClickListener {
             viewModel.savePlaylist()
-            findNavController().popBackStack()
-        }
-
-        viewModel.toastState.observe(viewLifecycleOwner) { toastState ->
-            if (toastState is ToastState.Show) {
-                showToast(toastState.additionalMessage)
-                viewModel.toastWasShown()
-            }
+            var playlistName = binding.inputNameNewPL.text.toString()
+            setSnackbar("Плейлист $playlistName успешно создан")
+            toBack()
         }
 
         binding.inputNameNewPL.addTextChangedListener(object : TextWatcher {
@@ -107,7 +104,6 @@ class NewPlaylistFragment : Fragment() {
             override fun onTextChanged(
                 s: CharSequence?, start: Int, before: Int, count: Int
             ) {
-                binding.clearNameNewPL.visibility = clearIconVisibility(s)
                 viewModel.editNamePL(s.toString())
             }
 
@@ -119,13 +115,11 @@ class NewPlaylistFragment : Fragment() {
             override fun onTextChanged(
                 s: CharSequence?, start: Int, before: Int, count: Int
             ) {
-                binding.clearDescriptionNewPL.visibility = clearIconVisibility(s)
                 viewModel.editDescriptionPL(s.toString())
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
-
 
         requireActivity().onBackPressedDispatcher.addCallback(object :
             OnBackPressedCallback(true) { // true означает, что callback активен по умолчанию
@@ -135,23 +129,9 @@ class NewPlaylistFragment : Fragment() {
             }
         })
 
-        binding.clearNameNewPL.setOnClickListener {
-            binding.inputNameNewPL.setText("")
-            inputMethodManager?.hideSoftInputFromWindow(binding.inputNameNewPL.windowToken, 0)
-        }
-
-        binding.clearDescriptionNewPL.setOnClickListener {
-            binding.inputNameNewPL.setText("")
-            inputMethodManager?.hideSoftInputFromWindow(
-                binding.clearDescriptionNewPL.windowToken,
-                0
-            )
-        }
-
         binding.toolbarNewPL.setNavigationOnClickListener {
             backToFragment()
         }
-
     }
 
     private fun saveImageToPrivateStorage(imageUri: Uri) {
@@ -203,8 +183,21 @@ class NewPlaylistFragment : Fragment() {
             if (state.namePL.isNotEmpty() || state.descriptionPL.isNotEmpty() || state.coverPathPL.isNotEmpty()) {
                 showDialog()
             } else {
-                findNavController().popBackStack()
+                toBack()
             }
+        }
+    }
+
+    private fun toBack() {
+        if (activity is RootActivity) {
+            findNavController().navigateUp()
+        } else {
+            val container =
+                requireActivity().findViewById<FragmentContainerView>(R.id.fragmentContainerView)
+            if (container.isVisible == true) {
+                fragmentManager?.popBackStack()
+            }
+            container.isVisible = false
         }
     }
 
@@ -221,8 +214,37 @@ class NewPlaylistFragment : Fragment() {
             .show()
     }
 
-    private fun showToast(additionalMessage: String) {
-        Toast.makeText(requireContext(), additionalMessage, Toast.LENGTH_LONG).show()
+    @SuppressLint("RestrictedApi")
+    private fun setSnackbar(additionalMessage: String) {
+
+        val inflater = LayoutInflater.from(view?.context)
+        val snackbarLayout: View = inflater.inflate(R.layout.snackbar, null)
+        val snackbarText: TextView = snackbarLayout.findViewById(R.id.snackbar_text)
+        snackbarText.text = additionalMessage
+
+        val snackbar =
+            view?.let {
+                Snackbar.make(
+                    it,
+                    "",
+                    Snackbar.LENGTH_SHORT
+                )
+            } // специально остаётся пустая строка
+
+        val snackbarView = snackbar?.view as Snackbar.SnackbarLayout
+        snackbarView.setPadding(0, 0, 0, 0) // Удаляем стандартные отступы
+        ViewCompat.setBackgroundTintList(
+            snackbarView,
+            ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.day_dark_and_night_white
+                )
+            )
+        )
+
+        snackbarView.addView(snackbarLayout, 0)
+        snackbar.show()
     }
 }
 

@@ -20,7 +20,7 @@ class LibraryDbInteractorImpl(private val libraryDbRepository: LibraryDbReposito
         return libraryDbRepository.deleteTrackFromFavoriteRepo(track)
     }
 
-    override suspend fun isTrackInFavorites(trackId: Int): Boolean {
+    override suspend fun isTrackInFavorites(trackId: Long): Boolean {
         return libraryDbRepository.isTrackInFavorites(trackId)
     }
 }
