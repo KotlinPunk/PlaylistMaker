@@ -8,8 +8,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentMediaLibraryBinding
-import com.practicum.playlistmaker.databinding.FragmentSettingsBinding
-
 
 class MediaLibraryFragment : Fragment() {
 

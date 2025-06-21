@@ -1,22 +1,31 @@
 package com.practicum.playlistmaker.player.ui.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.library.domain.api.intr.LibraryDbInteractor
+import com.practicum.playlistmaker.library.domain.api.intr.PlaylistInteractor
+import com.practicum.playlistmaker.library.domain.models.Playlist
+import com.practicum.playlistmaker.library.domain.models.PlaylistFragmentState
 import com.practicum.playlistmaker.player.domain.api.intr.AudioPlayerInteractor
 import com.practicum.playlistmaker.player.domain.models.AudioplayerState
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AudioPlayerViewModel(
     application: Application,
     private val mediaPlayerInteractor: AudioPlayerInteractor,
-    private val libraryDbInteractor: LibraryDbInteractor
+    private val libraryDbInteractor: LibraryDbInteractor,
+    private val playlistInteractor: PlaylistInteractor
 ) : AndroidViewModel(application) {
 
     private var timerJob: Job? = null
@@ -33,6 +42,10 @@ class AudioPlayerViewModel(
 
     private val _isFavorite = MutableLiveData<Boolean>(false)
     val isFavorite: LiveData<Boolean> = _isFavorite
+
+    private val _stateLiveDataPL = MutableLiveData<PlaylistFragmentState>()
+    val stateLiveDataPL: LiveData<PlaylistFragmentState> = _stateLiveDataPL
+
 
     fun setTrack(track: Track) { // метод для установки текущего треки и инициализации _isFavorite начальным значением
         currentTrack = track.copy() // для создания новой копии Track с изменённым isFavorite
@@ -62,6 +75,52 @@ class AudioPlayerViewModel(
             }
         }
     }
+
+
+    /* fun getPlaylists(){
+         viewModelScope.launch{
+             withContext(Dispatchers.IO){
+                 playlistInteractor
+                     .getAllPlaylistsIntr()
+                     .collect {
+                         if(it.isEmpty())
+                             _stateLiveDataPL.postValue(PlaylistFragmentState.Error(""))
+                         else
+                             _stateLiveDataPL.postValue(PlaylistFragmentState.Content(it))
+                     }
+             }
+         }
+     }
+ */
+    /* suspend fun getAllPlaylists(): List<Playlist> {
+         return playlistInteractor.getAllPlaylistsIntr().first() // сразу превращаем первый эелмент потока в List<Playlist>
+     }*/
+
+    fun fillDataPL() {
+        Log.d("AudioVM", "Beg")
+        viewModelScope.launch {
+            Log.d("AudioVM", "Ing")
+            withContext(Dispatchers.IO) {
+                playlistInteractor
+                    .getAllPlaylistsIntr()
+                    .collect { playlists -> processResult(playlists) }
+            }
+        }
+    }
+
+    private fun processResult(playlists: List<Playlist>) {
+        Log.d("AudioVM", "Received playlists: ${playlists.size}")
+        if (playlists.isEmpty()) {
+            renderState(PlaylistFragmentState.Error(""))
+        } else {
+            renderState(PlaylistFragmentState.Content(playlists))
+        }
+    }
+
+    private fun renderState(state: PlaylistFragmentState) {
+        _stateLiveDataPL.postValue(state)
+    }
+
 
     private fun preparePlayerVM(previewUrl: String?) {
         if (previewUrl == null) return // проверили на null

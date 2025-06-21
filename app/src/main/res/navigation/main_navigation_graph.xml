@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_mediaLibraryFragment_to_newPlaylistFragment2"
             app:destination="@id/newPlaylistFragment" />
+        <action
+            android:id="@+id/action_mediaLibraryFragment_to_audioplayerActivity"
+            app:destination="@id/audioplayerActivity" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"

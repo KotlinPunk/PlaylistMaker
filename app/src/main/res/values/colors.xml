@@ -17,4 +17,7 @@
     <color name="day_dark_and_night_white">#1A1B22</color>
     <color name="day_white_and_night_dark">#FFFFFF</color>
     <color name="color_divider">#E6E8EB</color>
+    <color name="day_light_gray_and_night_white">#E6E8EB</color>
+    <color name="overlay">#99000000</color>
+
 </resources>

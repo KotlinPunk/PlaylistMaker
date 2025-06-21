@@ -20,7 +20,7 @@ val viewModelModule = module {
 
     //player
     viewModel {
-        AudioPlayerViewModel(androidApplication(), get(), get())
+        AudioPlayerViewModel(androidApplication(), get(), get(), get())
     }
 
     //settings
