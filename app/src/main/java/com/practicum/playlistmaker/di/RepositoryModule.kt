@@ -21,22 +21,22 @@ import org.koin.dsl.module
 val repositoryModule = module {
 
     //search
-    single<TracksRepository> {
+    factory<TracksRepository> {
         TracksRepositoryImpl(get(), get(), androidContext(), get())
     }
 
     //player
-    single<AudioPlayerRepository> {
+    factory<AudioPlayerRepository> {
         AudioPlayerRepositoryImpl()
     }
 
     //sharing
-    single<SharingRepository> {
+    factory<SharingRepository> {
         SharingRepositoryImpl(androidContext(), get())
     }
 
     //settings
-    single<SettingsRepository> {
+    factory<SettingsRepository> {
         SettingsRepositoryImpl(context = androidContext())
     }
 
@@ -45,10 +45,10 @@ val repositoryModule = module {
     factory< PlaylistDbConvertor > { PlaylistDbConvertor() }
 
     //library
-    single<LibraryDbRepository> {
+    factory<LibraryDbRepository> {
         LibraryDbRepositoryImpl(get(), get())
     }
-    single<PlaylistRepository> {
+    factory<PlaylistRepository> {
         PlaylistRepositoryImpl(get(), get(), Gson())
     }
 }

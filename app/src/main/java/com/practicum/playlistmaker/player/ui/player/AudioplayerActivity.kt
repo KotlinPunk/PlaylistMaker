@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -42,27 +43,7 @@ class AudioplayerActivity : AppCompatActivity() {
         adapterPlayer = PlaylistAdapterMini(emptyList())
         binding.bottomRV.adapter = adapterPlayer
 
-        val bottomSheetContainer = binding.bottomSheet
-        val overlay = binding.overlay
-        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-        bottomSheetBehavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        overlay.isVisible = false
-                    }
-
-                    else -> {
-                        overlay.isVisible = true
-                    }
-                }
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-        })
 
         viewModel.stateLiveDataPL.observe(this) { state ->
             when (state) {
@@ -75,13 +56,13 @@ class AudioplayerActivity : AppCompatActivity() {
             when (state) {
                 is PlaylistStateInPlayer.AddedToPlaylist -> Toast.makeText(
                     applicationContext,
-                    "Добавлено в плейлист ${state.namePL}",
+                    getString(R.string.added_to_playlist, state.namePL),
                     Toast.LENGTH_LONG
                 ).show()
 
                 is PlaylistStateInPlayer.PresentInPlaylist -> Toast.makeText(
                     applicationContext,
-                    "Трек уже добавлен в плейлист ${state.namePL}",
+                    getString(R.string.present_in_playlist, state.namePL),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -90,8 +71,7 @@ class AudioplayerActivity : AppCompatActivity() {
         binding.addTrack.setOnClickListener {
             if (clickDebounce()) {
                 viewModel.fillDataPL()
-                bottomSheetContainer.isVisible = true
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                setBottomSheetBehavior(isVisible = true)
             }
         }
 
@@ -100,9 +80,11 @@ class AudioplayerActivity : AppCompatActivity() {
                 val fragment = NewPlaylistFragment()
                 val fragmentManager = supportFragmentManager
                 fragmentManager.beginTransaction().add(R.id.fragmentContainerView, fragment)
+                    .addToBackStack(null) // позволяет при свайпе или нажатии кнопки "назад" вернуться в активити
                     .commit()
                 binding.fragmentContainerView.isVisible = true
-                bottomSheetContainer.isVisible = false
+                setBottomSheetBehavior(isVisible = false)
+
             }
         }
 
@@ -225,6 +207,33 @@ class AudioplayerActivity : AppCompatActivity() {
             }
         }
         return current
+    }
+
+    private fun setBottomSheetBehavior(isVisible: Boolean){
+        val bottomSheetContainer = binding.bottomSheet
+        val overlay = binding.overlay
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
+        if (isVisible){
+            bottomSheetContainer.isVisible = true
+            overlay.isVisible = true // отобразить сразу, а не после обработки действия с BS
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            bottomSheetBehavior.addBottomSheetCallback(object :
+                BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            overlay.isVisible = false
+                        }
+
+                        else -> {}
+                    }
+                }
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            })
+        } else {
+            bottomSheetContainer.isVisible = false
+            overlay.isVisible = false // скрываем оверлей
+        }
     }
 
     override fun onPause() {

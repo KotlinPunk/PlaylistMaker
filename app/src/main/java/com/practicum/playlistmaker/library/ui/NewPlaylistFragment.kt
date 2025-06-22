@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,7 +31,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.root.RootActivity
-import com.practicum.playlistmaker.search.domain.models.ToastState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -55,6 +53,7 @@ class NewPlaylistFragment : Fragment() {
         _binding = FragmentNewPlaylistBinding.inflate(inflater, container, false)
         return binding.root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -95,7 +94,7 @@ class NewPlaylistFragment : Fragment() {
         binding.newPlaylistButton.setOnClickListener {
             viewModel.savePlaylist()
             var playlistName = binding.inputNameNewPL.text.toString()
-            setSnackbar("Плейлист $playlistName успешно создан")
+            setSnackbar(getString(R.string.playlist_created_success, playlistName))
             toBack()
         }
 
@@ -121,16 +120,21 @@ class NewPlaylistFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        requireActivity().onBackPressedDispatcher.addCallback(object :
-            OnBackPressedCallback(true) { // true означает, что callback активен по умолчанию
-            override fun handleOnBackPressed() {
-                backToFragment()
-                isEnabled = false // Отключить callback после обработки
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(  // привязка к жизненному циклу фрагмента, предотвращение утечек памяти, гарантия не активности
+            viewLifecycleOwner,                                 // колбека, когда нет фрагмента
+            object : OnBackPressedCallback(true) {              // получение состояние лайвдаты единожды, т.е. считывается раз, когда колбек зареган
+                override fun handleOnBackPressed() {            // колбек не реагирует на изменения лайвдаты, поэтому менее реактивный (прошлая версия была противоложна по действию)
+                    val state = viewModel.stateLiveData.value
+                    if (state != null && (state.namePL.isNotEmpty() || state.descriptionPL.isNotEmpty() || state.coverPathPL.isNotEmpty())) {
+                        showDialog()
+                    } else {
+                        toBack()
+                    }
+                }
+            })
 
         binding.toolbarNewPL.setNavigationOnClickListener {
-            backToFragment()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 
@@ -170,24 +174,6 @@ class NewPlaylistFragment : Fragment() {
         }
     }
 
-    private fun clearIconVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
-    }
-
-    private fun backToFragment() {
-        viewModel.stateLiveData.observe(viewLifecycleOwner) { state ->
-            if (state.namePL.isNotEmpty() || state.descriptionPL.isNotEmpty() || state.coverPathPL.isNotEmpty()) {
-                showDialog()
-            } else {
-                toBack()
-            }
-        }
-    }
-
     private fun toBack() {
         if (activity is RootActivity) {
             findNavController().navigateUp()
@@ -203,15 +189,21 @@ class NewPlaylistFragment : Fragment() {
 
     private fun showDialog() {
         MaterialAlertDialogBuilder(requireActivity())
-            .setTitle("Завершить создание плейлиста?")
-            .setMessage("Все несохраненные данные будут потеряны")
-            .setNeutralButton("Отмена") { dialog, which ->
+            .setTitle(getString(R.string.finish_creating_playlist))
+            .setMessage(getString(R.string.all_unsaves_data_will_be_lost))
+            .setNeutralButton(getString(R.string.cancel)) { dialog, which ->
                 dialog.dismiss()
             }
-            .setNegativeButton("Нет") { dialog, which ->
+            .setNegativeButton(getString(R.string.nope)) { dialog, which ->
                 findNavController().popBackStack()
             }
             .show()
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     @SuppressLint("RestrictedApi")

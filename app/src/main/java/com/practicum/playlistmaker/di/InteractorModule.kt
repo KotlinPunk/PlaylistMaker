@@ -19,19 +19,19 @@ import org.koin.dsl.module
 val interactorModule = module {
 
     //search
-    single<SearchHistoryInteractor> { SearchHistoryInteractorImpl(get()) }
-    single<SearchTracksInteractor> { SearchTracksInteractorImpl(get()) }
+    factory<SearchHistoryInteractor> { SearchHistoryInteractorImpl(get()) }
+    factory<SearchTracksInteractor> { SearchTracksInteractorImpl(get()) }
 
     //player
-    single<AudioPlayerInteractor> { AudioPlayerInteractorImpl(get()) }
+    factory<AudioPlayerInteractor> { AudioPlayerInteractorImpl(get()) }
 
     //sharing
-    single<SharingInteractor> { SharingInteractorImpl(get()) }
+    factory<SharingInteractor> { SharingInteractorImpl(get()) }
 
     //settings
-    single<SettingsInteractor> { SettingsInteractorImpl(get()) }
+    factory<SettingsInteractor> { SettingsInteractorImpl(get()) }
 
     //library
-    single<LibraryDbInteractor> { LibraryDbInteractorImpl(get()) }
-    single<PlaylistInteractor> { PlaylistInteractorImpl(get()) }
+    factory<LibraryDbInteractor> { LibraryDbInteractorImpl(get()) }
+    factory<PlaylistInteractor> { PlaylistInteractorImpl(get()) }
 }

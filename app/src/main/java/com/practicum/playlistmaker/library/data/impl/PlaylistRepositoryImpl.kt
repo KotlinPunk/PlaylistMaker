@@ -21,7 +21,7 @@ class PlaylistRepositoryImpl(
 ) : PlaylistRepository {
     override suspend fun insertPlaylistRepo(playlist: Playlist): Long {
         val plEntity = playlistToPlaylistEntity(playlist)
-        return withContext(Dispatchers.IO) { appDatabase.playlistDao().insertPlaylist(plEntity) }
+        return appDatabase.playlistDao().insertPlaylist(plEntity)
     }
 
     override fun getAllPlaylistsRepo(): Flow<List<Playlist>> =
@@ -72,34 +72,3 @@ class PlaylistRepositoryImpl(
     private fun String?.fromJson(gson: Gson): List<Long> =
         this?.let { gson.fromJson(it, Array<Long>::class.java)?.toList() } ?: emptyList()
 }
-
-/*
-override suspend fun addTrackToPlaylistRepo(
-    track: Track,
-    playlist: Playlist
-) {
-    val playlistAndTracksEntity = toPlaylistAndTracksEntity(track)
-
-    val trackIds = playlist.trackIds?.fromJson(gson) ?: emptyList()
-    if (trackIds.contains(track.trackId)) return // Трек уже есть - выходим
-    val trackId = track.trackId
-
-    */
-/*   val updatedTrackIds = trackIds + track.trackId
-       val playlistId = playlist.playlistId
-       val updatedPlaylist = playlist.copy(trackIds = updatedTrackIds.toJson(gson), trackCount = playlist.trackCount?.plus(1) ?: 1)*//*
-
-    val updateTracksIds = trackIds + track.trackId
-    val trackIds = playlist.trackIds?.fromJson(gson) ?: emptyList()
-    val updatePlaylistTrackCount = playlist.trackCount?.plus(1) ?: 1
-
-    val playlistId = playlist.playlistId
-    appDatabase.playlistDao().updatePlaylist(playlistDbConvertor.mapToPlaylistEntity(updatedPlaylist))
-    appDatabase.playlistDao().changeTracksList(
-        updateTracksIds = updatedTracksIds,
-        updateTrackCount = updatePlaylistTrackCount,
-        id = playlistId
-    )
-    appDatabase.playlistAndTracksDao().insertTrackToPlaylist(playlistAndTracksEntity)
-
-}*/
