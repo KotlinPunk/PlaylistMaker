@@ -75,8 +75,7 @@ dependencies {
     implementation("androidx.room:room-ktx:${Versions.roomVersion}")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
-    /*implementation("com.google.dagger:dagger-compiler:2.51.1")*/
     ksp("com.google.dagger:dagger-compiler:2.51.1")
-
 }

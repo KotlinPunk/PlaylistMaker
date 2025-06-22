@@ -4,14 +4,26 @@ import com.practicum.playlistmaker.search.data.models.TrackData
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
+import com.practicum.playlistmaker.library.domain.models.Playlist
+import com.practicum.playlistmaker.library.domain.models.PlaylistFragmentState
+import com.practicum.playlistmaker.library.ui.NewPlaylistFragment
+import com.practicum.playlistmaker.library.ui.PlaylistAdapterMini
 import com.practicum.playlistmaker.player.domain.models.AudioplayerState
+import com.practicum.playlistmaker.player.domain.models.PlaylistStateInPlayer
 import com.practicum.playlistmaker.player.ui.viewmodel.AudioPlayerViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AudioplayerActivity : AppCompatActivity() {
@@ -20,11 +32,61 @@ class AudioplayerActivity : AppCompatActivity() {
     private val binding: ActivityAudioplayerBinding get() = requireNotNull(_binding) { "Binding wasn't initiliazed!" }
     private var trackData: TrackData? = null
     private val viewModel by viewModel<AudioPlayerViewModel>()
+    private var adapterPlayer: PlaylistAdapterMini? = null
+    private var isClickAllowed = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityAudioplayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        adapterPlayer = PlaylistAdapterMini(emptyList())
+        binding.bottomRV.adapter = adapterPlayer
+
+
+
+        viewModel.stateLiveDataPL.observe(this) { state ->
+            when (state) {
+                is PlaylistFragmentState.Content -> showPlaylistTracks(state.playlistTracks)
+                is PlaylistFragmentState.Error -> showErrorMessage(state.message)
+            }
+        }
+
+        viewModel.statePLInPlayer.observe(this) { state ->
+            when (state) {
+                is PlaylistStateInPlayer.AddedToPlaylist -> Toast.makeText(
+                    applicationContext,
+                    getString(R.string.added_to_playlist, state.namePL),
+                    Toast.LENGTH_LONG
+                ).show()
+
+                is PlaylistStateInPlayer.PresentInPlaylist -> Toast.makeText(
+                    applicationContext,
+                    getString(R.string.present_in_playlist, state.namePL),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+        binding.addTrack.setOnClickListener {
+            if (clickDebounce()) {
+                viewModel.fillDataPL()
+                setBottomSheetBehavior(isVisible = true)
+            }
+        }
+
+        binding.createPlaylistButton.setOnClickListener {
+            if (clickDebounce()) {
+                val fragment = NewPlaylistFragment()
+                val fragmentManager = supportFragmentManager
+                fragmentManager.beginTransaction().add(R.id.fragmentContainerView, fragment)
+                    .addToBackStack(null) // позволяет при свайпе или нажатии кнопки "назад" вернуться в активити
+                    .commit()
+                binding.fragmentContainerView.isVisible = true
+                setBottomSheetBehavior(isVisible = false)
+
+            }
+        }
 
         trackData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra(TRACK_DATA, TrackData::class.java)
@@ -63,6 +125,12 @@ class AudioplayerActivity : AppCompatActivity() {
                         )
                     )
                     .into(placeholderTrack)
+            }
+        }
+
+        adapterPlayer?.onClickPl = { playlists: Playlist ->
+            if (clickDebounce()) {
+                viewModel.addTrackToPlaylist(track = track!!, playlists)
             }
         }
 
@@ -113,6 +181,61 @@ class AudioplayerActivity : AppCompatActivity() {
         )
     }
 
+    private fun showPlaylistTracks(favPlaylists: List<Playlist>) {
+        binding.playlistScroll.isVisible = true
+        binding.bottomRV.isVisible = true
+        if (adapterPlayer == null) { //для обновления адептера и для реакции слушателя
+            adapterPlayer = PlaylistAdapterMini(favPlaylists)
+            binding.bottomRV.adapter = adapterPlayer
+        } else {
+            adapterPlayer?.updateData(favPlaylists) // Создайте метод updateData в адаптере
+        }
+    }
+
+    private fun showErrorMessage(errorMessage: String) {
+        binding.playlistScroll.isVisible = false
+        binding.bottomRV.isVisible = false
+    }
+
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
+        }
+        return current
+    }
+
+    private fun setBottomSheetBehavior(isVisible: Boolean){
+        val bottomSheetContainer = binding.bottomSheet
+        val overlay = binding.overlay
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
+        if (isVisible){
+            bottomSheetContainer.isVisible = true
+            overlay.isVisible = true // отобразить сразу, а не после обработки действия с BS
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            bottomSheetBehavior.addBottomSheetCallback(object :
+                BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            overlay.isVisible = false
+                        }
+
+                        else -> {}
+                    }
+                }
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            })
+        } else {
+            bottomSheetContainer.isVisible = false
+            overlay.isVisible = false // скрываем оверлей
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         viewModel.pausePlayerVM()
@@ -125,5 +248,6 @@ class AudioplayerActivity : AppCompatActivity() {
 
     companion object {
         private const val TRACK_DATA = "track_data"
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }

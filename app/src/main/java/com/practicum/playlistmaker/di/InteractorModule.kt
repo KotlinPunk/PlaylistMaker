@@ -1,7 +1,9 @@
 package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.library.domain.api.intr.LibraryDbInteractor
+import com.practicum.playlistmaker.library.domain.api.intr.PlaylistInteractor
 import com.practicum.playlistmaker.library.domain.impl.LibraryDbInteractorImpl
+import com.practicum.playlistmaker.library.domain.impl.PlaylistInteractorImpl
 import com.practicum.playlistmaker.player.domain.api.intr.AudioPlayerInteractor
 import com.practicum.playlistmaker.player.domain.impl.AudioPlayerInteractorImpl
 import com.practicum.playlistmaker.search.domain.api.intr.SearchHistoryInteractor
@@ -17,18 +19,19 @@ import org.koin.dsl.module
 val interactorModule = module {
 
     //search
-    single<SearchHistoryInteractor> { SearchHistoryInteractorImpl(get()) }
-    single<SearchTracksInteractor> { SearchTracksInteractorImpl(get()) }
+    factory<SearchHistoryInteractor> { SearchHistoryInteractorImpl(get()) }
+    factory<SearchTracksInteractor> { SearchTracksInteractorImpl(get()) }
 
     //player
-    single<AudioPlayerInteractor> { AudioPlayerInteractorImpl(get()) }
+    factory<AudioPlayerInteractor> { AudioPlayerInteractorImpl(get()) }
 
     //sharing
-    single<SharingInteractor> { SharingInteractorImpl(get()) }
+    factory<SharingInteractor> { SharingInteractorImpl(get()) }
 
     //settings
-    single<SettingsInteractor> { SettingsInteractorImpl(get()) }
+    factory<SettingsInteractor> { SettingsInteractorImpl(get()) }
 
     //library
-    single<LibraryDbInteractor> { LibraryDbInteractorImpl(get()) }
+    factory<LibraryDbInteractor> { LibraryDbInteractorImpl(get()) }
+    factory<PlaylistInteractor> { PlaylistInteractorImpl(get()) }
 }

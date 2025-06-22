@@ -121,6 +121,10 @@ class FavoriteFragment : Fragment() {
         super.onResume()
         viewModel.fillData()
     }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     companion object {
         fun newInstance() = FavoriteFragment()

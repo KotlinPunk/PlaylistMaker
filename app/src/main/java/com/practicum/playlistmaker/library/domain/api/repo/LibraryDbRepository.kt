@@ -8,5 +8,5 @@ interface LibraryDbRepository {
     suspend fun getTracksFromFavoriteRepo(): Flow<List<Track>>
     suspend fun insertTrackToFavoriteRepo(track: Track)
     suspend fun deleteTrackFromFavoriteRepo(track: Track)
-    suspend fun isTrackInFavorites(trackId: Int): Boolean
+    suspend fun isTrackInFavorites(trackId: Long): Boolean
 }

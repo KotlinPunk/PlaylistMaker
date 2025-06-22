@@ -1,6 +1,8 @@
 package com.practicum.playlistmaker.di
 
+import com.google.gson.Gson
 import com.practicum.playlistmaker.library.viewmodel.FavoriteFragmentViewModel
+import com.practicum.playlistmaker.library.viewmodel.NewPlaylistFragmentViewModel
 import com.practicum.playlistmaker.library.viewmodel.PlaylistFragmentViewModel
 import com.practicum.playlistmaker.player.ui.viewmodel.AudioPlayerViewModel
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchTrackViewModel
@@ -19,7 +21,7 @@ val viewModelModule = module {
 
     //player
     viewModel {
-        AudioPlayerViewModel(androidApplication(), get(), get())
+        AudioPlayerViewModel(androidApplication(), get(), get(), get(), Gson())
     }
 
     //settings
@@ -34,6 +36,11 @@ val viewModelModule = module {
 
     //playlistfragment
     viewModel {
-        PlaylistFragmentViewModel()
+        PlaylistFragmentViewModel(androidContext(), get())
+    }
+
+    //newPlaylistFragment
+    viewModel {
+        NewPlaylistFragmentViewModel(get())
     }
 }

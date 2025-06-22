@@ -12,3 +12,4 @@ sealed interface FavoriteFragmentState {
         val message: String
     ) : FavoriteFragmentState
 }
+

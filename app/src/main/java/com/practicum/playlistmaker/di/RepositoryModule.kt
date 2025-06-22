@@ -1,9 +1,13 @@
 package com.practicum.playlistmaker.di
 
+import com.google.gson.Gson
 import com.practicum.playlistmaker.library.data.impl.LibraryDbRepositoryImpl
+import com.practicum.playlistmaker.library.data.impl.PlaylistRepositoryImpl
 import com.practicum.playlistmaker.library.domain.api.repo.LibraryDbRepository
+import com.practicum.playlistmaker.library.domain.api.repo.PlaylistRepository
 import com.practicum.playlistmaker.player.data.impl.AudioPlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.api.repo.AudioPlayerRepository
+import com.practicum.playlistmaker.search.data.PlaylistDbConvertor
 import com.practicum.playlistmaker.search.data.TrackDbConvertor
 import com.practicum.playlistmaker.search.data.impl.TracksRepositoryImpl
 import com.practicum.playlistmaker.search.domain.api.repo.TracksRepository
@@ -17,30 +21,34 @@ import org.koin.dsl.module
 val repositoryModule = module {
 
     //search
-    single<TracksRepository> {
+    factory<TracksRepository> {
         TracksRepositoryImpl(get(), get(), androidContext(), get())
     }
 
     //player
-    single<AudioPlayerRepository> {
+    factory<AudioPlayerRepository> {
         AudioPlayerRepositoryImpl()
     }
 
     //sharing
-    single<SharingRepository> {
+    factory<SharingRepository> {
         SharingRepositoryImpl(androidContext(), get())
     }
 
     //settings
-    single<SettingsRepository> {
+    factory<SettingsRepository> {
         SettingsRepositoryImpl(context = androidContext())
     }
 
     //convector
     factory< TrackDbConvertor > { TrackDbConvertor() }
+    factory< PlaylistDbConvertor > { PlaylistDbConvertor() }
 
     //library
-    single<LibraryDbRepository> {
+    factory<LibraryDbRepository> {
         LibraryDbRepositoryImpl(get(), get())
+    }
+    factory<PlaylistRepository> {
+        PlaylistRepositoryImpl(get(), get(), Gson())
     }
 }

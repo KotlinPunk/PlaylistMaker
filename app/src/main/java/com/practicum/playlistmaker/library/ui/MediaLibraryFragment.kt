@@ -8,8 +8,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentMediaLibraryBinding
-import com.practicum.playlistmaker.databinding.FragmentSettingsBinding
-
 
 class MediaLibraryFragment : Fragment() {
 
@@ -29,6 +27,7 @@ class MediaLibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.viewPager.offscreenPageLimit = 1
         binding.viewPager.adapter =
             LibraryViewPagerAdapter(fragmentManager = childFragmentManager, lifecycle = lifecycle)
 

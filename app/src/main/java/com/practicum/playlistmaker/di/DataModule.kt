@@ -50,7 +50,9 @@ val dataModule = module {
     single {
         try {
             Log.d("Koin", "Creating AppDatabase")
-            Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db").build()
+            Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+                .fallbackToDestructiveMigration()
+                .build()
         } catch (e: Exception) {
             Log.e("Koin", "Error creating AppDatabase: ", e)
             throw e
