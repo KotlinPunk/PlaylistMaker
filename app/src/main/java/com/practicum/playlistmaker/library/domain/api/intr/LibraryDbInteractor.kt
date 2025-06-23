@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.library.domain.api.intr
 
+import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 
@@ -9,4 +10,6 @@ interface LibraryDbInteractor {
     suspend fun deleteTrackFromFavoriteIntr(track: Track)
     suspend fun isTrackInFavorites(trackId: Long): Boolean
     suspend fun getPlaylistTotalDurationIntr(playlistName: String): Flow<Long?>
+
+    suspend fun getTrackInPlaylistIntr(playlistName: String): Flow<List<Track>>
 }

@@ -2,12 +2,14 @@ package com.practicum.playlistmaker.library.data.impl
 
 import android.util.Log
 import com.practicum.playlistmaker.library.domain.api.repo.LibraryDbRepository
+import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.search.data.TrackDbConvertor
 import com.practicum.playlistmaker.search.data.db.AppDatabase
 import com.practicum.playlistmaker.search.data.db.entity.TrackEntity
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlin.text.isNullOrEmpty
 
 class LibraryDbRepositoryImpl(
     private val appDatabase: AppDatabase,
@@ -58,6 +60,37 @@ class LibraryDbRepositoryImpl(
             }
         }
     }
+
+    override suspend fun getTrackInPlaylistRepo(playlistName: String): Flow<List<Track>> = flow {
+        try {
+
+            appDatabase.trackDao().getTrackIdsForPlaylist(playlistName).collect { trackIdsString ->
+
+                if (trackIdsString.isNullOrEmpty()) {
+                    emit(emptyList())
+                    return@collect
+                }
+
+                val trackIds = trackIdsString.removeSurrounding("[", "]")
+                    .split(",")
+                    .mapNotNull { it.trim().toLongOrNull() }
+
+                if (trackIds.isEmpty()) {
+                    emit(emptyList())
+                    return@collect
+                }
+
+                appDatabase.trackDao().getTracksByIds(trackIds).collect { trackEntities ->
+                    val tracks = trackEntities.map { trackDbConvertor.mapFromPlaylistAndTracksToTrack(it) }
+                    emit(tracks)
+                }
+            }
+
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
+    }
+
 
 
     private fun trackToTrackEntity(track: Track): TrackEntity {

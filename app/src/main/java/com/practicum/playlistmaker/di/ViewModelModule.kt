@@ -47,6 +47,6 @@ val viewModelModule = module {
 
     //infoOfPlaylist
     viewModel {
-        InfoOfPlaylistsViewModel(get(), get())
+        InfoOfPlaylistsViewModel(get(), get(), Gson())
     }
 }

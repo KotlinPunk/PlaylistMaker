@@ -66,8 +66,7 @@ class PlaylistFragment : Fragment() {
 
         adapter?.onClickPL = { playlist: Playlist ->
                 clickDebounce()
-                val playlistId = playlist.playlistId
-                    ?: -1L // если playlistId null, присваиваем значение по умолчанию (-1L)
+                val playlistId = playlist.playlistId ?: -1L // если playlistId null, присваиваем значение по умолчанию (-1L)
                 if (playlistId != -1L) {
                     val bundle = Bundle().apply {
                         putLong(PLAYLIST_ID, playlistId)
