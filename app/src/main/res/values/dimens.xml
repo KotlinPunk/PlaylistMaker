@@ -20,12 +20,14 @@
     <dimen name="one_hundred_twenty_eight_dp">128dp</dimen>
     <dimen name="one_hundred_forty_dp">140dp</dimen>
     <dimen name="two_hundred_twelve_dp">212dp</dimen>
+    <dimen name="two_sixty_six_dp">266dp</dimen>
 
     <dimen name="eleven_sp">11sp</dimen>
     <dimen name="twelve_sp">12sp</dimen>
     <dimen name="thirteen_sp">13sp</dimen>
     <dimen name="fourteen_sp">14sp</dimen>
     <dimen name="sixteen_sp">16sp</dimen>
+    <dimen name="eighteen_sp">18sp</dimen>
     <dimen name="nineteen_sp">19sp</dimen>
     <dimen name="twenty_two_sp">22sp</dimen>
     <dimen name="twenty_four_sp">24sp</dimen>

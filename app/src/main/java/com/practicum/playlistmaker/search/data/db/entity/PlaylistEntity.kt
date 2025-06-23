@@ -8,10 +8,11 @@ import com.google.gson.Gson
 @Entity(tableName = "playlist_table")
 data class PlaylistEntity(
     @PrimaryKey(autoGenerate = true)
-    val playlistId: Long = 0,
+    val playlistId: Long = 0L,
     val playlistName: String,
     val playlistDescription: String,
     val playlistCoverPath: String?,
     var trackIds: String?,
-    var trackCount: Int = 0
+    var trackCount: Int = 0,
+    var totalDuration: Long = 0L
 )

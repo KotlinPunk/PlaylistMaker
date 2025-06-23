@@ -25,9 +25,10 @@ class RootActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.newPlaylistFragment, R.id.audioplayerActivity -> {
+                R.id.newPlaylistFragment, R.id.audioplayerActivity, R.id.infoOfPlaylistsFragment -> {
                     binding.bottomNavigationView.isVisible = false
                 }
+
                 else -> binding.bottomNavigationView.isVisible = true
             }
         }
@@ -35,6 +36,7 @@ class RootActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
     }
+
     override fun onDestroy() {
         super.onDestroy()
         _binding = null

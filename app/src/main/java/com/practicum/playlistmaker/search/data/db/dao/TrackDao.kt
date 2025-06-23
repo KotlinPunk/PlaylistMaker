@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.practicum.playlistmaker.search.data.db.entity.TrackEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrackDao {
@@ -23,4 +24,11 @@ interface TrackDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM track_table WHERE trackId = :trackId)") // интересует только лишь наличие хотя бы одной строки
     suspend fun isTrackInFavorites(trackId: Long): Boolean // true - строка есть, иначе false
+
+
+    @Query("SELECT trackIds FROM playlist_table WHERE playlistName = :playlistName")
+    fun getTrackIdsForPlaylist(playlistName: String): Flow<String?>
+
+    @Query("SELECT * FROM track_table WHERE trackId IN (:trackIds)")
+    fun getTracksByIds(trackIds: List<Long>): Flow<List<TrackEntity>>
 }

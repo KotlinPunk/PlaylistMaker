@@ -16,7 +16,7 @@ interface PlaylistDao {
     suspend fun insertPlaylist(playlistEntity: PlaylistEntity): Long
 
     @Query("SELECT * FROM playlist_table WHERE playlistId = :playlistId")
-    suspend fun getPlaylist(playlistId: Long): PlaylistEntity?
+    suspend fun getPlaylist(playlistId: Long?): PlaylistEntity?
 
     @Query("SELECT * FROM playlist_table")
     fun getAllPlaylists(): Flow<List<PlaylistEntity>>

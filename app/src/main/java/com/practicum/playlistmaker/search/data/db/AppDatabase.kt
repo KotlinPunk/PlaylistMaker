@@ -10,7 +10,7 @@ import com.practicum.playlistmaker.search.data.db.entity.PlaylistEntity
 import com.practicum.playlistmaker.search.data.db.entity.TrackEntity
 
 @Database(
-    version = 4,
+    version = 7,
     entities = [TrackEntity::class, PlaylistEntity::class, PlaylistAndTracksEntity::class],
     exportSchema = false
 )

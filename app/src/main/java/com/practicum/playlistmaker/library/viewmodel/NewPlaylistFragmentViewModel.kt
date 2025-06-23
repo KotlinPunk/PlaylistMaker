@@ -47,12 +47,13 @@ class NewPlaylistFragmentViewModel(private val playlistInteractor: PlaylistInter
                 ?: return@launch // проверка состояния, если null, то сразу выходим из корутины
             try {
                 val playlist = Playlist(
+                    playlistId = null,
                     playlistName = currentState.namePL,
                     playlistDescription = currentState.descriptionPL,
                     playlistCoverPath = currentState.coverPathPL,
-                    playlistId = null,
                     trackIds = null,
-                    trackCount = null
+                    trackCount = null,
+                    totalDuration = 0L
                 )
                 val newPlaylistId =
                     playlistInteractor.insertPlaylistIntr(playlist) // получили id плейлиста, добавив в БД новый плейлист

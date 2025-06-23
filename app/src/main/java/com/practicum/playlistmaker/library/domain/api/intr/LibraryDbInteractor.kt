@@ -8,4 +8,5 @@ interface LibraryDbInteractor {
     suspend fun insertTrackToFavoriteIntr(track: Track)
     suspend fun deleteTrackFromFavoriteIntr(track: Track)
     suspend fun isTrackInFavorites(trackId: Long): Boolean
+    suspend fun getPlaylistTotalDurationIntr(playlistName: String): Flow<Long?>
 }

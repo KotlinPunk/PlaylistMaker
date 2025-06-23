@@ -24,12 +24,15 @@ class PlaylistRepositoryImpl(
         return appDatabase.playlistDao().insertPlaylist(plEntity)
     }
 
+    override suspend fun getPlaylistRepo(playlistId: Long?): Playlist? {
+        val playlistEntity = appDatabase.playlistDao().getPlaylist(playlistId)
+        return playlistEntity?.let { playlistDbConvertor.mapToPlaylist(it) }
+    }
+
     override fun getAllPlaylistsRepo(): Flow<List<Playlist>> =
         appDatabase.playlistDao().getAllPlaylists()
             .map { playlists ->
                 playlists.map { plEntity -> playlistDbConvertor.mapToPlaylist(plEntity) }
-
-
             }
 
     override suspend fun addTrackToPlaylistRepo(

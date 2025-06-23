@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.library.data.impl
 
+import android.util.Log
 import com.practicum.playlistmaker.library.domain.api.repo.LibraryDbRepository
 import com.practicum.playlistmaker.search.data.TrackDbConvertor
 import com.practicum.playlistmaker.search.data.db.AppDatabase
@@ -32,6 +33,32 @@ class LibraryDbRepositoryImpl(
         val isInFavorites = appDatabase.trackDao().isTrackInFavorites(trackId)
         return isInFavorites
     }
+
+    override suspend fun getPlaylistTotalDurationRepo(playlistName: String): Flow<Long?> = flow {
+        appDatabase.trackDao().getTrackIdsForPlaylist(playlistName).collect { trackIdsString ->
+            if (trackIdsString.isNullOrEmpty()) {
+                emit(0L)                                            // плейлист пуст или его нет
+            } else {
+                val trackIds = trackIdsString.removeSurrounding(    // убираем префиксы и суффиксы, а именно [ и ]
+                    "[",
+                    "]"
+                )
+                    .split(",")                         // разделяем строку
+                    .mapNotNull {
+                        it.trim().toLongOrNull()        // убираем пробелы на всякий случай в начале и конце строки,
+                    }                                   // приводим к Long, а дальше фильтруем на null
+                if (trackIds.isEmpty()) {
+                    emit(0L)
+                } else {
+                    appDatabase.trackDao().getTracksByIds(trackIds).collect { tracks ->
+                        val totalDuration = tracks.sumOf { it.trackTimeMillis }
+                        emit(totalDuration)
+                    }
+                }
+            }
+        }
+    }
+
 
     private fun trackToTrackEntity(track: Track): TrackEntity {
         return trackDbConvertor.mapToTrackEntity(track)

@@ -14,7 +14,8 @@ class PlaylistDbConvertor {
             playlist.playlistDescription,
             playlist.playlistCoverPath,
             playlist.trackIds ?: "[]",
-            playlist.trackCount ?: 0
+            playlist.trackCount ?: 0,
+            playlist.totalDuration ?: 0
         )
     }
 
@@ -25,7 +26,8 @@ class PlaylistDbConvertor {
             playlistEntity.playlistDescription,
             playlistEntity.playlistCoverPath,
             playlistEntity.trackIds,
-            playlistEntity.trackCount
+            playlistEntity.trackCount,
+            playlistEntity.totalDuration
         )
     }
 
