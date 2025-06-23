@@ -59,7 +59,37 @@ class LibraryDbRepositoryImpl(
         }
     }
 
+    override suspend fun getTracksInPlaylistRepo(playlistName: String): Flow<List<Track>> = flow {
+        try {
+            val trackIdsStringFlow: Flow<String?> = appDatabase.trackDao().getTrackIdsForPlaylist(playlistName)
 
+            trackIdsStringFlow.collect { trackIdsString ->
+                if (trackIdsString.isNullOrEmpty()) {
+                    emit(emptyList())
+                    return@collect
+                }
+
+                val trackIds = trackIdsString.removeSurrounding("[", "]")
+                    .split(",")
+                    .mapNotNull { it.trim().toLongOrNull() }
+
+                if (trackIds.isEmpty()) {
+                    emit(emptyList())
+                    return@collect
+                }
+
+                val trackEntitiesFlow: Flow<List<TrackEntity>> = appDatabase.trackDao().getTracksByIds(trackIds)
+
+                trackEntitiesFlow.collect { trackEntities ->
+                    val tracks = trackEntities.map { trackDbConvertor.mapToTrack(it) }
+                    emit(tracks)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("getTracksInPlaylistRepo", "Error fetching tracks", e)
+            emit(emptyList())
+        }
+    }
     private fun trackToTrackEntity(track: Track): TrackEntity {
         return trackDbConvertor.mapToTrackEntity(track)
     }

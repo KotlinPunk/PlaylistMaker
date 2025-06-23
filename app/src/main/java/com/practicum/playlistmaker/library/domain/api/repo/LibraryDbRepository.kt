@@ -11,4 +11,5 @@ interface LibraryDbRepository {
     suspend fun deleteTrackFromFavoriteRepo(track: Track)
     suspend fun isTrackInFavorites(trackId: Long): Boolean
     suspend fun getPlaylistTotalDurationRepo(playlistName: String): Flow<Long?>
+    suspend fun getTracksInPlaylistRepo(playlistName: String): Flow<List<Track>>
 }

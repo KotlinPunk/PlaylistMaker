@@ -26,9 +26,18 @@ interface TrackDao {
     suspend fun isTrackInFavorites(trackId: Long): Boolean // true - строка есть, иначе false
 
 
+
+
     @Query("SELECT trackIds FROM playlist_table WHERE playlistName = :playlistName")
     fun getTrackIdsForPlaylist(playlistName: String): Flow<String?>
 
     @Query("SELECT * FROM track_table WHERE trackId IN (:trackIds)")
     fun getTracksByIds(trackIds: List<Long>): Flow<List<TrackEntity>>
+
+
+    @Query("DELETE FROM track_table WHERE trackId = :id")
+    suspend fun deleteTracksById(id: Int)
+
+
+
 }

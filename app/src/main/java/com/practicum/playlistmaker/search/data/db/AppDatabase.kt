@@ -10,7 +10,7 @@ import com.practicum.playlistmaker.search.data.db.entity.PlaylistEntity
 import com.practicum.playlistmaker.search.data.db.entity.TrackEntity
 
 @Database(
-    version = 7,
+    version = 11,
     entities = [TrackEntity::class, PlaylistEntity::class, PlaylistAndTracksEntity::class],
     exportSchema = false
 )
@@ -21,5 +21,4 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun playlistDao(): PlaylistDao
 
     abstract fun playlistAndTracksDao(): PlaylistAndTracksDao
-
 }

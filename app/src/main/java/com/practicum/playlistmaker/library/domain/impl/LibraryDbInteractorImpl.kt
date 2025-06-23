@@ -31,5 +31,9 @@ class LibraryDbInteractorImpl(private val libraryDbRepository: LibraryDbReposito
         return libraryDbRepository.getPlaylistTotalDurationRepo(playlistName)
     }
 
+    override suspend fun getTracksInPlaylistIntr(playlistName: String): Flow<List<Track>> {
+        return libraryDbRepository.getTracksInPlaylistRepo(playlistName)
+    }
+
 
 }

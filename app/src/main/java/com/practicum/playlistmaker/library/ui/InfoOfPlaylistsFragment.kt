@@ -1,26 +1,30 @@
 package com.practicum.playlistmaker.library.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentInfoOfPlaylistsBinding
+import com.practicum.playlistmaker.library.domain.models.FavoriteFragmentState
 import com.practicum.playlistmaker.library.domain.models.InfoOfPlaylistState
 import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.library.viewmodel.InfoOfPlaylistsViewModel
-import com.practicum.playlistmaker.library.viewmodel.PlaylistFragmentViewModel
 import com.practicum.playlistmaker.player.ui.player.AudioplayerActivity
+import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.ui.search.TrackAdapter
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
 import kotlin.getValue
@@ -30,14 +34,10 @@ class InfoOfPlaylistsFragment : Fragment() {
     private var _binding: FragmentInfoOfPlaylistsBinding? = null
     private val binding: FragmentInfoOfPlaylistsBinding get() = requireNotNull(_binding) { "Binding wasn't initiliazed!" }
     private var adapter: TrackAdapter? = null
-    private val trackListFavorite = ArrayList<Track>()
-    private lateinit var rvTrackListFavorite: RecyclerView
-    private lateinit var placeholderErrorImageFragment: ImageView
-    private lateinit var placeholderErrorTextFragment: TextView
-
-
+    private lateinit var rvTrackList: RecyclerView
+    private var job: Job? = null
     private val viewModel by viewModel<InfoOfPlaylistsViewModel>()
-
+    private lateinit var chosenPlaylist: Playlist
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,6 +53,33 @@ class InfoOfPlaylistsFragment : Fragment() {
 
         val playlistId = arguments?.getLong(PLAYLIST_ID)
         viewModel.loadPlaylistData(playlistId)
+        viewModel.fillTrackData(playlistId)
+
+
+        adapter = TrackAdapter(emptyList())
+        rvTrackList = binding.bottomRvPl
+        rvTrackList.adapter = adapter
+
+        adapter?.onClickTrack = { track ->
+            navigateToPlayer(track)}
+
+
+
+
+
+
+
+        viewModel.stateTrackData.observe(viewLifecycleOwner) { state ->
+
+            when (state) {
+                is FavoriteFragmentState.Content -> {showTracksInList(favTracksInList = state.favoriteTracks)
+
+                }
+                is FavoriteFragmentState.Error -> showError(errorMessage = state.message)
+            }
+        }
+
+
 
         viewModel.playlistInfo.observe(viewLifecycleOwner) { state ->
             when(state){
@@ -67,7 +94,6 @@ class InfoOfPlaylistsFragment : Fragment() {
         }
 
     }
-
     private fun showContent(playlist: Playlist?){
         playlist?.let{
             with(binding) {
@@ -92,6 +118,52 @@ class InfoOfPlaylistsFragment : Fragment() {
         }
     }
 
+    private fun showTracksInList(favTracksInList: List<Track>) {
+        rvTrackList.isVisible = true
+        binding.trackScrollPL.isVisible = true
+        if (adapter == null) { //для обновления адептера и для реакции слушателя
+            adapter = TrackAdapter(favTracksInList)
+            rvTrackList.adapter = adapter
+        } else {
+            adapter?.updateData(favTracksInList) // Создайте метод updateData в адаптере
+        }
+    }
+
+    private fun showError(errorMessage: String) {
+        rvTrackList.isVisible = false
+        binding.trackScrollPL.isVisible = false
+    }
+
+
+
+
+
+    private fun navigateToPlayer(track: Track) {
+            val trackData = TrackData(
+                track.trackName,
+                track.artistName,
+                track.trackTimeMillis,
+                track.artworkUrl100,
+                track.trackId,
+                track.collectionName,
+                track.releaseDate,
+                track.primaryGenreName,
+                track.country,
+                track.previewUrl,
+                track.isFavorite
+            )
+            val action = Intent(requireContext(), AudioplayerActivity::class.java)
+            action.putExtra(InfoOfPlaylistsFragment.Companion.TRACK_DATA, trackData)
+            startActivity(action)
+    }
+
+    private fun clickDebounce() {
+        job?.cancel()
+        job = viewLifecycleOwner.lifecycleScope.launch {
+            delay(CLICK_DEBOUNCE_DELAY)
+        }
+    }
+
     private fun endingCount(trackCount: Int?): String {
         if (trackCount == null) return "треков"
         return when {
@@ -112,6 +184,7 @@ class InfoOfPlaylistsFragment : Fragment() {
         }
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -119,6 +192,8 @@ class InfoOfPlaylistsFragment : Fragment() {
 
     companion object{
         private const val PLAYLIST_ID = "playlist_id"
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val TRACK_DATA = "track_data"
     }
 
 }
