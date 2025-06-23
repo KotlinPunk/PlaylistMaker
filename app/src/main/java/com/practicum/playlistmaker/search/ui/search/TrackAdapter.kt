@@ -4,9 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.databinding.TrackItemBinding
+import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.search.domain.models.Track
 
-class TrackAdapter(private val trackList: ArrayList<Track>) :
+class TrackAdapter(private var trackList: List<Track>) :
     RecyclerView.Adapter<TrackHolder>() {
 
     var onClickTrack: ((Track) -> Unit)? = null
@@ -31,5 +32,10 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
 
     override fun getItemCount(): Int {
         return trackList.size
+    }
+
+    fun updateData(newTrackList: List<Track>) {
+        trackList = newTrackList
+        notifyDataSetChanged()
     }
 }

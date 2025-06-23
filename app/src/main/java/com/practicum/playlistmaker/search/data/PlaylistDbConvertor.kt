@@ -42,7 +42,24 @@ class PlaylistDbConvertor {
             track.releaseDate,
             track.primaryGenreName,
             track.country,
-            track.previewUrl,
+            track.previewUrl
         )
     }
+
+    fun mapToTrack(playlistAndTracksEntity: PlaylistAndTracksEntity): Track{
+        return Track(
+            playlistAndTracksEntity.trackName,
+            playlistAndTracksEntity.artistName,
+            playlistAndTracksEntity.trackTimeMillis,
+            playlistAndTracksEntity.artworkUrl100,
+            playlistAndTracksEntity.trackId,
+            playlistAndTracksEntity.collectionName,
+            playlistAndTracksEntity.releaseDate,
+            playlistAndTracksEntity.primaryGenreName,
+            playlistAndTracksEntity.country,
+            playlistAndTracksEntity.previewUrl
+        )
+    }
+
+
 }
