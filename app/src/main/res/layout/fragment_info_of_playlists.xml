@@ -6,11 +6,12 @@
     android:layout_height="match_parent"
     android:background="@color/ligth_gray"
     android:orientation="vertical"
-    tools:context="com.practicum.playlistmaker.library.ui.InfoOfPlaylistsFragment">
+    tools:context="com.practicum.playlistmaker.library.ui.frags.InfoOfPlaylistsFragment">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="visible" >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_playlist_info"
@@ -155,6 +156,7 @@
         android:background="@drawable/shape_corner_edit_rectangle"
         android:elevation="@dimen/sixteen_dp"
         app:behavior_hideable="false"
+        android:visibility="gone"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
@@ -189,28 +191,29 @@
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#99000000"
+        android:background="@color/overlay"
         android:visibility="gone" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/ll_bs_more_menu"
+        android:id="@+id/bottomSheetUp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/shape_corner_edit_text"
+        android:layout_height="400dp"
+        android:background="@drawable/shape_corner_edit_rectangle"
         android:paddingHorizontal="@dimen/sixteen_dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:behavior_hideable="true"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
-            android:id="@+id/drag_handle"
-            android:layout_width="48dp"
-            android:layout_height="4dp"
+            android:id="@+id/lineBottomUp"
+            android:layout_width="@dimen/fifty_two"
+            android:layout_height="@dimen/four_dp"
             android:layout_marginTop="@dimen/eight_dp"
-            android:background="@drawable/shape_corner_edit_text"
+            android:background="@color/day_light_gray_and_night_white"
+            android:src="@drawable/shape_line_bs"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <include
             android:id="@+id/small_playlist_card"
@@ -220,13 +223,17 @@
             android:layout_marginTop="@dimen/eight_dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/drag_handle" />
+            app:layout_constraintTop_toBottomOf="@id/lineBottomUp" />
 
         <TextView
             android:id="@+id/tv_share"
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:gravity="center_vertical"
+            android:fontFamily="@font/ys_display_regular"
+            android:textColor="@color/day_dark_and_night_white"
+            android:textSize="@dimen/sixteen_sp"
+            android:textFontWeight="400"
             android:text="@string/share"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -237,23 +244,29 @@
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:gravity="center_vertical"
-            android:text="info"
+            android:fontFamily="@font/ys_display_regular"
+            android:textSize="@dimen/sixteen_sp"
+            android:textFontWeight="400"
+            android:textColor="@color/day_dark_and_night_white"
+            android:text="@string/edit_playlist"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_share" />
 
         <TextView
-            android:id="@+id/tv_delete_playlist"
+            android:id="@+id/deletePlaylist"
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:gravity="center_vertical"
-            android:text="delete"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:fontFamily="@font/ys_display_regular"
+            android:textColor="@color/day_dark_and_night_white"
+            android:textSize="@dimen/sixteen_sp"
+            android:textFontWeight="400"
+            android:text="@string/delete_playlist"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_edit" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.library.ui
+package com.practicum.playlistmaker.library.ui.frags
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
@@ -25,20 +25,18 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentNewPlaylistBinding
 import com.practicum.playlistmaker.library.viewmodel.NewPlaylistFragmentViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.getValue
-import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.root.RootActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-
 
 class NewPlaylistFragment : Fragment() {
     private var _binding: FragmentNewPlaylistBinding? = null
@@ -234,10 +232,7 @@ class NewPlaylistFragment : Fragment() {
                 )
             )
         )
-
         snackbarView.addView(snackbarLayout, 0)
         snackbar.show()
     }
 }
-
-

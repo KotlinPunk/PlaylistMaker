@@ -61,7 +61,6 @@ class PlaylistRepositoryImpl(
 
     }
 
-
     private fun playlistToPlaylistEntity(playlist: Playlist): PlaylistEntity {
         return playlistDbConvertor.mapToPlaylistEntity(playlist)
     }
@@ -125,7 +124,6 @@ class PlaylistRepositoryImpl(
             appDatabase.playlistAndTracksDao().deleteTrackFromAnyPlaylist(chosenTrackEntity)
         }
     }
-
 
     // Функция для преобразования списка Track ID в JSON строку
     private fun List<Long>.toJson(gson: Gson): String = gson.toJson(this)

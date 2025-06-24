@@ -17,7 +17,7 @@ import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.databinding.ActivityAudioplayerBinding
 import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.library.domain.models.PlaylistFragmentState
-import com.practicum.playlistmaker.library.ui.NewPlaylistFragment
+import com.practicum.playlistmaker.library.ui.frags.NewPlaylistFragment
 import com.practicum.playlistmaker.library.ui.PlaylistAdapterMini
 import com.practicum.playlistmaker.player.domain.models.AudioplayerState
 import com.practicum.playlistmaker.player.domain.models.PlaylistStateInPlayer

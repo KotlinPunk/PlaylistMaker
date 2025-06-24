@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.library.ui
+package com.practicum.playlistmaker.library.ui.frags
 
 import android.content.Intent
 import android.os.Bundle
@@ -21,8 +21,6 @@ import com.practicum.playlistmaker.search.ui.search.TrackAdapter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.String
-import kotlin.collections.List
 
 class FavoriteFragment : Fragment() {
 
@@ -100,7 +98,7 @@ class FavoriteFragment : Fragment() {
                 track.isFavorite
             )
             val action = Intent(requireContext(), AudioplayerActivity::class.java)
-            action.putExtra(FavoriteFragment.Companion.TRACK_DATA, trackData)
+            action.putExtra(TRACK_DATA, trackData)
             startActivity(action)
         }
     }

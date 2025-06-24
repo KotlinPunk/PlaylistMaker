@@ -9,10 +9,10 @@ import com.practicum.playlistmaker.library.domain.models.NewPlaylistFragmentStat
 import com.practicum.playlistmaker.library.domain.models.Playlist
 import kotlinx.coroutines.launch
 
-class NewPlaylistFragmentViewModel(private val playlistInteractor: PlaylistInteractor) :
+open class NewPlaylistFragmentViewModel(private val playlistInteractor: PlaylistInteractor) :
     ViewModel() {
 
-    private val _stateLiveData =
+    internal val _stateLiveData =
         MutableLiveData<NewPlaylistFragmentState>()
     val stateLiveData: LiveData<NewPlaylistFragmentState> = _stateLiveData
 
@@ -41,7 +41,7 @@ class NewPlaylistFragmentViewModel(private val playlistInteractor: PlaylistInter
         renderState(newState)
     }
 
-    fun savePlaylist() {
+    open fun savePlaylist() {
         viewModelScope.launch {
             val currentState = _stateLiveData.value
                 ?: return@launch // проверка состояния, если null, то сразу выходим из корутины
