@@ -111,6 +111,19 @@ class PlaylistRepositoryImpl(
         }
     }
 
+    override suspend fun deletePlaylistRepo(playlistId: Long?) {
+        appDatabase.playlistDao().deletePlaylist(playlistId)
+    }
+
+    override suspend fun editPlaylistRepo(
+        idPl: Long?,
+        namePl: String,
+        descriptionPl: String,
+        imagePl: String?
+    ) {
+        appDatabase.playlistDao().editPlaylist(idPl, namePl, descriptionPl, imagePl)
+    }
+
 
     private suspend fun checkTrackInPlaylists(track: Track, playlists: List<Playlist>) {
         var check = 0

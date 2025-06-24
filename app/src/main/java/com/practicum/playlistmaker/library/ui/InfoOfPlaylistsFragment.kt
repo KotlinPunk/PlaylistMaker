@@ -7,22 +7,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentInfoOfPlaylistsBinding
+import com.practicum.playlistmaker.databinding.PlaylistMiniItemBinding
 import com.practicum.playlistmaker.library.domain.models.FavoriteFragmentState
 import com.practicum.playlistmaker.library.domain.models.InfoOfPlaylistState
 import com.practicum.playlistmaker.library.domain.models.Playlist
-import com.practicum.playlistmaker.library.domain.models.PlaylistFragmentState
 import com.practicum.playlistmaker.library.viewmodel.InfoOfPlaylistsViewModel
-import com.practicum.playlistmaker.library.viewmodel.PlaylistFragmentViewModel
 import com.practicum.playlistmaker.player.ui.player.AudioplayerActivity
 import com.practicum.playlistmaker.search.data.models.TrackData
 import com.practicum.playlistmaker.search.domain.models.Track
@@ -37,6 +34,8 @@ class InfoOfPlaylistsFragment : Fragment() {
     private val binding: FragmentInfoOfPlaylistsBinding get() = requireNotNull(_binding) { "Binding wasn't initiliazed!" }
     private var adapter: TrackAdapter? = null
     private val trackListFavorite = ArrayList<Track>()
+    private lateinit var itemBinding: PlaylistMiniItemBinding
+    private lateinit var playlistElement: Playlist
 
     private val viewModel by viewModel<InfoOfPlaylistsViewModel>()
 
@@ -57,6 +56,8 @@ class InfoOfPlaylistsFragment : Fragment() {
         viewModel.loadPlaylistData(playlistId)
         viewModel.fillTrackData(playlistId)
 
+        itemBinding =
+            PlaylistMiniItemBinding.bind(binding.root.findViewById(R.id.small_playlist_card))
         adapter = TrackAdapter(trackListFavorite)
         binding.bottomRvPl.adapter = adapter
 
@@ -64,20 +65,36 @@ class InfoOfPlaylistsFragment : Fragment() {
             navigateToPlayer(track)
         }
 
-        adapter?.onLongClickTrack ={ track ->
-            AlertDialog.Builder(requireContext()/*, R.style.AlertDialogTheme*/)
+        /* binding.tvShare.setOnClickListener {
+             shareApp()
+         }
+ */
+        binding.tvEdit.setOnClickListener {
+
+        }
+        binding.deletePlaylist.setOnClickListener {
+            dialogDeletePlaylist(playlistElement)
+        }
+
+        adapter?.onLongClickTrack = { track ->
+            MaterialAlertDialogBuilder(requireContext())
                 .setMessage("Хотите удалить трек?")
                 .setNegativeButton("НЕТ") { dialog, _ ->
                     dialog.dismiss()
                 }
                 .setPositiveButton("ДА") { dialog, _ ->
                     dialog.dismiss()
-                    viewModel.deleteTrackToPlaylist(track,playlistId)
+                    viewModel.deleteTrackToPlaylist(track, playlistId)
                 }
                 .show()
         }
+        /*binding.sharePL.setOnClickListener {
+            shareApp()
+        }*/
 
-
+        binding.morePL.setOnClickListener {
+            setBottomSheetBehavior(isVisible = true)
+        }
 
         viewModel.stateLiveTrackData.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -86,12 +103,8 @@ class InfoOfPlaylistsFragment : Fragment() {
             }
         }
 
-
-
-
-
         viewModel.playlistInfo.observe(viewLifecycleOwner) { state ->
-            when(state){
+            when (state) {
                 is InfoOfPlaylistState.Content -> showContent(state.playlist)
 
                 is InfoOfPlaylistState.Error -> TODO()
@@ -101,12 +114,55 @@ class InfoOfPlaylistsFragment : Fragment() {
         binding.arrowbackPL.setOnClickListener {
             findNavController().navigateUp()
         }
-
     }
 
 
-    private fun showContent(playlist: Playlist?){
-        playlist?.let{
+    /*    private fun shareApp() {
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                val shareMessage = viewModel.getShareMessage(binding.countPL.text.toString())
+                if (shareMessage.isBlank()) {
+                    AlertDialog.Builder(requireContext())
+                        .setMessage("В этом плейлисте нет списка треков, которым можно поделиться")
+                        .setPositiveButton("OK", null)
+                        .show()
+                    return
+                }
+                putExtra(Intent.EXTRA_TEXT, shareMessage)
+            }
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)))
+        }*/
+
+    private fun setBottomSheetBehavior(isVisible: Boolean) {
+        val bottomSheetContainer = binding.BottomSheetUp
+        val overlay = binding.overlay
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
+        if (isVisible) {
+            bottomSheetContainer.isVisible = true
+            overlay.isVisible = true // отобразить сразу, а не после обработки действия с BS
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            bottomSheetBehavior.addBottomSheetCallback(object :
+                BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            overlay.isVisible = false
+                        }
+
+                        else -> {}
+                    }
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            })
+        } else {
+            bottomSheetContainer.isVisible = false
+            overlay.isVisible = false // скрываем оверлей
+        }
+    }
+
+    private fun showContent(playlist: Playlist?) {
+        playlist?.let {
             with(binding) {
                 namePL.text = playlist.playlistName
                 descriptionPL.text = playlist.playlistDescription
@@ -115,7 +171,7 @@ class InfoOfPlaylistsFragment : Fragment() {
                     val minutes = TimeUnit.MILLISECONDS.toMinutes(totalDuration)
                     durationPL.text = String.format("%d", minutes) + " ${endingDuration(minutes)}"
                 } ?: run {
-                    durationPL.text = "Заглушка"
+                    durationPL.text = "Error"
                 }
                 if (playlist.playlistCoverPath != null) {
                     Glide.with(requireContext())
@@ -123,12 +179,30 @@ class InfoOfPlaylistsFragment : Fragment() {
                         .transform(CenterCrop())
                         .placeholder(R.drawable.ic_placeholder_312_x_312)
                         .into(binding.imagePL)
-
+                    Glide.with(requireContext())
+                        .load(playlist.playlistCoverPath)
+                        .transform(CenterCrop())
+                        .placeholder(R.drawable.ic_placeholder)
+                        .into(itemBinding.imagePLMini)
+                    itemBinding.namePLMini.text = playlist.playlistName
+                    itemBinding.countPLMini.text =
+                        "${playlist.trackCount} ${endingCount(playlist.trackCount)}"
                 }
             }
         }
     }
 
+
+    private fun dialogDeletePlaylist(playlist: Playlist) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Хотите удалить плейлист \"${playlist.playlistName}\"?")
+            .setNegativeButton(requireActivity().getString(R.string.nope)) { _, _ ->
+
+            }.setPositiveButton(requireActivity().getString(R.string.yep)) { _, _ ->
+                viewModel.deletePlaylist(playlist.playlistId)
+                findNavController().navigateUp()
+            }
+    }
 
     private fun showFavoriteTracks(favTracks: List<Track>) {
         binding.bottomRvPl.isVisible = true
@@ -146,28 +220,23 @@ class InfoOfPlaylistsFragment : Fragment() {
 
     }
 
-
-
-
     private fun navigateToPlayer(track: Track) {
-
-            val trackData = TrackData(
-                track.trackName,
-                track.artistName,
-                track.trackTimeMillis,
-                track.artworkUrl100,
-                track.trackId,
-                track.collectionName,
-                track.releaseDate,
-                track.primaryGenreName,
-                track.country,
-                track.previewUrl,
-                track.isFavorite
-            )
-            val action = Intent(requireContext(), AudioplayerActivity::class.java)
-            action.putExtra(InfoOfPlaylistsFragment.Companion.TRACK_DATA, trackData)
-            startActivity(action)
-
+        val trackData = TrackData(
+            track.trackName,
+            track.artistName,
+            track.trackTimeMillis,
+            track.artworkUrl100,
+            track.trackId,
+            track.collectionName,
+            track.releaseDate,
+            track.primaryGenreName,
+            track.country,
+            track.previewUrl,
+            track.isFavorite
+        )
+        val action = Intent(requireContext(), AudioplayerActivity::class.java)
+        action.putExtra(InfoOfPlaylistsFragment.Companion.TRACK_DATA, trackData)
+        startActivity(action)
     }
 
     private fun endingCount(trackCount: Int?): String {
@@ -195,7 +264,7 @@ class InfoOfPlaylistsFragment : Fragment() {
         _binding = null
     }
 
-    companion object{
+    companion object {
         private const val PLAYLIST_ID = "playlist_id"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val TRACK_DATA = "track_data"

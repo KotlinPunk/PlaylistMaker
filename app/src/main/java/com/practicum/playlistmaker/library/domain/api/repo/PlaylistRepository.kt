@@ -14,4 +14,13 @@ interface PlaylistRepository {
     suspend fun addTrackToPlaylistRepo(track: Track, playlist: Playlist)
 
     suspend fun deleteTrackFromAnyListRepo(track: Track, playlist: Playlist?)
+
+    suspend fun deletePlaylistRepo(playlistId: Long?)
+
+    suspend fun editPlaylistRepo(
+        idPl: Long?,
+        namePl: String,
+        descriptionPl: String,
+        imagePl: String?
+    )
 }
