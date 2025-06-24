@@ -152,11 +152,10 @@
         android:id="@+id/bottomSheetPL"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:behavior_peekHeight="@dimen/two_sixty_six_dp"
+        app:behavior_peekHeight="@dimen/one_hundred_forty_dp"
         android:background="@drawable/shape_corner_edit_rectangle"
         android:elevation="@dimen/sixteen_dp"
         app:behavior_hideable="false"
-        android:visibility="gone"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View

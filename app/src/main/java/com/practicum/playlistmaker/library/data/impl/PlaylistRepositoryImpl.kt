@@ -125,6 +125,24 @@ class PlaylistRepositoryImpl(
         }
     }
 
+    override suspend fun deletePlaylistRepo(playlistId: Long?) {
+        appDatabase.playlistDao().deletePlaylist(playlistId)
+    }
+
+    override suspend fun editPlaylistRepo(
+        idPl: Long?,
+        namePl: String,
+        descriptionPl: String,
+        imagePl: String?
+    ) {
+        appDatabase.playlistDao().editPlaylist(
+            idPl,
+            namePl,
+            descriptionPl,
+            imagePl
+        )
+    }
+
     // Функция для преобразования списка Track ID в JSON строку
     private fun List<Long>.toJson(gson: Gson): String = gson.toJson(this)
 

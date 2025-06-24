@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,9 +53,47 @@ class NewPlaylistFragment : Fragment() {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // проверка для режима редактирования
+        val isEditing = arguments?.getBoolean("is_editing", false) ?: false
+        Log.d("NewPlaylistFragment", "isEditing: $isEditing")
+        if (isEditing) {
+            // переносим данные для редакции
+            val playlistId = arguments?.getLong("playlist_id", -1)
+            val playlistName = arguments?.getString("playlist_name", "")
+            val playlistDescription = arguments?.getString("playlist_description", "")
+            val playlistCoverPath = arguments?.getString("playlist_cover_path", "")
+            Log.d(
+                "NewPlaylistFragment",
+                "Editing playlist: id=$playlistId, name=$playlistName, description=$playlistDescription"
+            )
+
+            viewModel.loadPlaylistForEditing(
+                playlistId,
+                playlistName ?: "",
+                playlistDescription ?: "",
+                playlistCoverPath
+            )
+            // обновляем UI в режиме редактирования
+            binding.toolbarNewPL.title = getString(R.string.edit_playlist)
+            binding.newPlaylistButton.text = getString(R.string.save)
+            // подгружаем картинку
+            if (!playlistCoverPath.isNullOrEmpty()) {
+                Glide.with(requireContext())
+                    .load(playlistCoverPath)
+                    .transform(CenterCrop())
+                    .placeholder(R.drawable.ic_placeholder_312_x_312)
+                    .into(binding.imageNewPL)
+            }
+        } else {
+            // иначе создаём новый плейлист
+            binding.toolbarNewPL.title = getString(R.string.new_playlist)
+            binding.newPlaylistButton.text = getString(R.string.create)
+        }
+
+
 
         viewModel.stateLiveData.observe(viewLifecycleOwner) { state ->
             // обновили ui в зависимости от состояния
@@ -64,7 +103,7 @@ class NewPlaylistFragment : Fragment() {
             if (binding.inputDescriptionNewPL.text.toString() != state.descriptionPL) {
                 binding.inputDescriptionNewPL.setText(state.descriptionPL)
             }
-            // меняем состояние кнопки "Создать"
+            // меняем состояние кнопки "Создать" или "Сохранить"
             val color = if (state.isSaveButtinEnabled) {
                 ContextCompat.getColor(requireContext(), R.color.blue)
             } else {
@@ -92,7 +131,11 @@ class NewPlaylistFragment : Fragment() {
         binding.newPlaylistButton.setOnClickListener {
             viewModel.savePlaylist()
             var playlistName = binding.inputNameNewPL.text.toString()
-            setSnackbar(getString(R.string.playlist_created_success, playlistName))
+            if (viewModel.isEditingMode()) {
+                setSnackbar(getString(R.string.playlist_updated_success, playlistName))
+            } else {
+                setSnackbar(getString(R.string.playlist_created_success, playlistName))
+            }
             toBack()
         }
 
@@ -120,7 +163,8 @@ class NewPlaylistFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(  // привязка к жизненному циклу фрагмента, предотвращение утечек памяти, гарантия не активности
             viewLifecycleOwner,                                 // колбека, когда нет фрагмента
-            object : OnBackPressedCallback(true) {              // получение состояние лайвдаты единожды, т.е. считывается раз, когда колбек зареган
+            object :
+                OnBackPressedCallback(true) {              // получение состояние лайвдаты единожды, т.е. считывается раз, когда колбек зареган
                 override fun handleOnBackPressed() {            // колбек не реагирует на изменения лайвдаты, поэтому менее реактивный (прошлая версия была противоложна по действию)
                     val state = viewModel.stateLiveData.value
                     if (state != null && (state.namePL.isNotEmpty() || state.descriptionPL.isNotEmpty() || state.coverPathPL.isNotEmpty())) {
@@ -136,7 +180,7 @@ class NewPlaylistFragment : Fragment() {
         }
     }
 
-    private fun saveImageToPrivateStorage(imageUri: Uri) {
+    private fun saveImageToPrivateStorage(imageUri: Uri) { // надо будет вынести во вьюМодел
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 val inputStream: InputStream? =

@@ -10,10 +10,11 @@ import com.practicum.playlistmaker.library.domain.api.intr.LibraryDbInteractor
 import com.practicum.playlistmaker.library.domain.api.intr.PlaylistInteractor
 import com.practicum.playlistmaker.library.domain.models.FavoriteFragmentState
 import com.practicum.playlistmaker.library.domain.models.InfoOfPlaylistState
-import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.player.domain.models.PlaylistStateInPlayer
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -36,12 +37,24 @@ class InfoOfPlaylistsViewModel(
     private val _statePLInPlayer = MutableLiveData<PlaylistStateInPlayer>()
     val statePLInPlayer: LiveData<PlaylistStateInPlayer> = _statePLInPlayer
 
+    private val _totalDuration = MutableStateFlow<Long?>(null)
+    val totalDuration: StateFlow<Long?> = _totalDuration
+
+    private var currentPlaylistId: Long? = null
+
 
     fun deletePlaylist(playlistId: Long?) {
         viewModelScope.launch {
             playlistInteractor.getPlaylistIntr(playlistId)
+            try {
+                playlistInteractor.deletePlaylistIntr(playlistId)
+                Log.d("InfoOfPlaylistsViewModel", "Playlist deleted successfully")
+            } catch (e: Exception) {
+                Log.e("InfoOfPlaylistsViewModel", "Error deleting playlist", e)
+            }
         }
     }
+
 
     fun deleteTrackToPlaylist(track: Track, playlistId: Long?) {
 
@@ -76,6 +89,7 @@ class InfoOfPlaylistsViewModel(
 
 
     fun loadPlaylistData(playlistId: Long?) {
+        currentPlaylistId = playlistId
         viewModelScope.launch {
             try {
                 if (playlistId != -1L) {
@@ -86,6 +100,7 @@ class InfoOfPlaylistsViewModel(
                     Log.d("ViewModel", "trackIdsString: $trackIdsString")
                     libraryDbInteractor.getPlaylistTotalDurationIntr(trackIdsString.toString())
                         .collect { totalDuration ->
+                            _totalDuration.value = totalDuration
                             Log.d("ViewModel", "totalDuration from interactor: $totalDuration")
                             _playlistInfo.postValue(
                                 InfoOfPlaylistState.Content(
@@ -102,6 +117,69 @@ class InfoOfPlaylistsViewModel(
             }
         }
     }
+
+    fun refreshPlaylistData() {
+        currentPlaylistId?.let { playlistId ->
+            Log.d(
+                "InfoOfPlaylistsViewModel",
+                "Refreshing playlist data for ID: $playlistId"
+            )
+            viewModelScope.launch {
+                try {
+                    // Get fresh data from database
+                    val freshPlaylist = playlistInteractor.getPlaylistIntr(playlistId)
+                    if (freshPlaylist != null) {
+                        Log.d(
+                            "InfoOfPlaylistsViewModel",
+                            "Fresh playlist data loaded: ${freshPlaylist.playlistName}"
+                        )
+                        _playlistInfo.postValue(InfoOfPlaylistState.Content(freshPlaylist))
+                        // Also refresh track data
+                        fillTrackData(playlistId)
+                    } else {
+                        Log.w(
+                            "InfoOfPlaylistsViewModel",
+                            "Playlist not found in database"
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e(
+                        "InfoOfPlaylistsViewModel",
+                        "Error refreshing playlist data",
+                        e
+                    )
+                }
+            }
+        }
+    }
+
+    // подписываем на изменения ДБ для текущего плейлиста
+    fun subscribeToPlaylistChanges() {
+        viewModelScope.launch {
+            try {
+                playlistInteractor.getAllPlaylistsIntr().collect { playlists ->
+                    // находим текущий плейлист и обновляем список
+                    currentPlaylistId?.let { playlistId ->
+                        val updatedPlaylist = playlists.find { it.playlistId == playlistId }
+                        if (updatedPlaylist != null) {
+                            Log.d(
+                                "InfoOfPlaylistsViewModel",
+                                "Playlist updated in database: ${updatedPlaylist.playlistName}"
+                            )
+                            _playlistInfo.postValue(InfoOfPlaylistState.Content(updatedPlaylist))
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(
+                    "InfoOfPlaylistsViewModel",
+                    "Error subscribing to playlist changes",
+                    e
+                )
+            }
+        }
+    }
+
 
     fun fillTrackData(playlistId: Long?) {
         viewModelScope.launch {
@@ -127,48 +205,6 @@ class InfoOfPlaylistsViewModel(
             }
         }
     }
-
-
-    /*    fun getShareMessage(countWithPlurals: String, tracks: List<Track>?): String {
-            return when (val state = _playlistInfo.value) {
-                is InfoOfPlaylistState.Content -> {
-                    if (state.playlist?.trackCount == 0 || tracks.isNullOrEmpty()) { // Проверяем наличие треков
-                        ""
-                    } else {
-                        buildShareMessage(state, countWithPlurals)
-                    }
-                }
-                else -> ""
-            }
-        }*/
-
-    /*   private fun buildShareMessage(content: InfoOfPlaylistState.Content, countWithPlurals: String): String {
-           val stringBuilder = StringBuilder()
-
-           content.playlist?.let { playlist ->
-               stringBuilder.append(playlist.playlistName ?: "")
-               if (!playlist.playlistDescription.isNullOrBlank()) {
-                   stringBuilder.append("\n${playlist.playlistDescription}")
-               }
-           }
-
-           stringBuilder.append("\n$countWithPlurals")
-
-           content.tracks?.forEachIndexed { index, track ->
-               val formattedTime = formatTrackTime(track.trackTimeMillis) // Используем форматтер
-               stringBuilder.append("\n${index + 1}. ${track.artistName} - ${track.trackName} ($formattedTime)")
-           }
-
-           return stringBuilder.toString()
-       }
-   */
-    // Функция для форматирования времени трека в мм:сс
-    private fun formatTrackTime(millis: Long): String {
-        val minutes = (millis / (1000 * 60)) % 60
-        val seconds = (millis / 1000) % 60
-        return String.format("%02d:%02d", minutes, seconds)
-    }
-
 
     private fun processResult(tracks: List<Track>) {
         if (tracks.isEmpty()) {
