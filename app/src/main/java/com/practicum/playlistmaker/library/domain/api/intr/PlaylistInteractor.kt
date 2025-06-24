@@ -12,4 +12,13 @@ interface PlaylistInteractor {
     suspend fun addTrackToPlaylistIntr(track: Track, playlist: Playlist)
 
     suspend fun deleteTrackFromAnyListIntr(track: Track, playlist: Playlist?)
+
+    suspend fun deletePlaylistIntr(playlistId: Long?)
+
+    suspend fun editPlaylistIntr(
+        idPl: Long?,
+        namePl: String,
+        descriptionPl: String,
+        imagePl: String?
+    )
 }
