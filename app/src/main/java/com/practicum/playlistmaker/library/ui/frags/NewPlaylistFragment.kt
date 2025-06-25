@@ -57,14 +57,14 @@ class NewPlaylistFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // проверка для режима редактирования
-        val isEditing = arguments?.getBoolean("is_editing", false) ?: false
+        val isEditing = arguments?.getBoolean(PL_EDIT, false) ?: false
         Log.d("NewPlaylistFragment", "isEditing: $isEditing")
         if (isEditing) {
             // переносим данные для редакции
-            val playlistId = arguments?.getLong("playlist_id", -1)
-            val playlistName = arguments?.getString("playlist_name", "")
-            val playlistDescription = arguments?.getString("playlist_description", "")
-            val playlistCoverPath = arguments?.getString("playlist_cover_path", "")
+            val playlistId = arguments?.getLong(PLAYLIST_ID, -1)
+            val playlistName = arguments?.getString(PL_NAME, "")
+            val playlistDescription = arguments?.getString(PL_DESC, "")
+            val playlistCoverPath = arguments?.getString(PL_COVER_PATH, "")
             Log.d(
                 "NewPlaylistFragment",
                 "Editing playlist: id=$playlistId, name=$playlistName, description=$playlistDescription"
@@ -278,5 +278,13 @@ class NewPlaylistFragment : Fragment() {
         )
         snackbarView.addView(snackbarLayout, 0)
         snackbar.show()
+    }
+
+    companion object {
+        private const val PLAYLIST_ID = "playlist_id"
+        private const val PL_NAME = "playlist_name"
+        private const val PL_DESC = "playlist_description"
+        private const val PL_COVER_PATH = "playlist_cover_path"
+        private const val PL_EDIT = "is_editing"
     }
 }

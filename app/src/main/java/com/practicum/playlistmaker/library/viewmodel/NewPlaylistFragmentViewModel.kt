@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.library.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -118,7 +119,7 @@ open class NewPlaylistFragmentViewModel(private val playlistInteractor: Playlist
                     renderState(newState)
                 }
             } catch (e: Exception) {
-                android.util.Log.e("NewPlaylistFragmentViewModel", "Error saving playlist", e)
+                Log.e("NewPlaylistFragmentViewModel", "Error saving playlist", e)
                 val newState = currentState.copy(saveResult = null, saveError = e)
                 renderState(newState)
             }

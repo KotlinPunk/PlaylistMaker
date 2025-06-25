@@ -8,154 +8,151 @@
     android:orientation="vertical"
     tools:context="com.practicum.playlistmaker.library.ui.frags.InfoOfPlaylistsFragment">
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_playlist_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible" >
+        android:background="@android:color/transparent"
+        app:layout_anchorGravity="center">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_playlist_info"
-            android:layout_width="match_parent"
+    <ImageButton
+        android:id="@+id/arrowbackPL"
+            style="@style/ArrowBackImageButtonActivityMain"
+            android:layout_marginStart="@dimen/sixteen_dp"
+            android:layout_marginTop="@dimen/sixteen_dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/leftGid"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            app:layout_anchor="@+id/scrollView2"
-            app:layout_anchorGravity="center">
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/sixteen_dp" />
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/leftGid"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_begin="@dimen/sixteen_dp" />
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/rightGid"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_end="@dimen/sixteen_dp" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/rightGid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/sixteen_dp" />
 
-            <ImageView
-                android:id="@+id/imagePL"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_placeholder_312_x_312"
-                app:layout_constraintBottom_toTopOf="@+id/namePL"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageButton
-                android:id="@+id/arrowbackPL"
-                style="@style/ArrowBackImageButtonActivityMain"
-                android:layout_marginStart="@dimen/sixteen_dp"
-                android:layout_marginTop="@dimen/sixteen_dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/imagePL"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_placeholder_312_x_312"
+            app:layout_constraintBottom_toTopOf="@+id/namePL"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"/>
 
-            <TextView
-                android:id="@+id/namePL"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/twenty_four_dp"
-                android:ellipsize="marquee"
-                android:fontFamily="@font/ys_display_bold"
-                android:maxLines="1"
-                android:textColor="@color/dark_color"
-                android:textFontWeight="700"
-                android:textSize="@dimen/twenty_four_sp"
-                app:layout_constraintBottom_toTopOf="@+id/descriptionPL"
-                app:layout_constraintEnd_toStartOf="@id/rightGid"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/leftGid"
-                app:layout_constraintTop_toBottomOf="@id/imagePL"
-                tools:text="Smells Like Teen Spirit Smells Like Teen Spirit Smells Like Teen Spirit" />
 
-            <TextView
-                android:id="@+id/descriptionPL"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/eight_dp"
-                android:ellipsize="marquee"
-                android:fontFamily="@font/ys_display_regular"
-                android:maxLines="1"
-                android:textColor="@color/dark_color"
-                android:textFontWeight="400"
-                android:textSize="@dimen/eighteen_sp"
-                app:layout_constraintBottom_toTopOf="@+id/flowUnderDescriptionPL"
-                app:layout_constraintEnd_toStartOf="@id/rightGid"
-                app:layout_constraintStart_toStartOf="@+id/leftGid"
-                app:layout_constraintTop_toBottomOf="@id/namePL"
-                tools:text="Smells Like Teen Spirit Smells Like Teen Spirit Smells Like Teen Spirit" />
+        <TextView
+            android:id="@+id/namePL"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/twenty_four_dp"
+            android:ellipsize="marquee"
+            android:fontFamily="@font/ys_display_bold"
+            android:maxLines="1"
+            android:textColor="@color/dark_color"
+            android:textFontWeight="700"
+            android:textSize="@dimen/twenty_four_sp"
+            app:layout_constraintBottom_toTopOf="@+id/descriptionPL"
+            app:layout_constraintEnd_toStartOf="@id/rightGid"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/leftGid"
+            app:layout_constraintTop_toBottomOf="@id/imagePL"
+            tools:text="Smells Like Teen Spirit Smells Like Teen Spirit Smells Like Teen Spirit" />
+        <TextView
+            android:id="@+id/descriptionPL"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/eight_dp"
+            android:ellipsize="marquee"
+            android:fontFamily="@font/ys_display_regular"
+            android:maxLines="1"
+            android:textColor="@color/dark_color"
+            android:textFontWeight="400"
+            android:textSize="@dimen/eighteen_sp"
+            app:layout_constraintBottom_toTopOf="@+id/flowUnderDescriptionPL"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintEnd_toStartOf="@id/rightGid"
+            app:layout_constraintStart_toStartOf="@+id/leftGid"
+            app:layout_constraintTop_toBottomOf="@id/namePL"
+            tools:text="Smells Like Teen Spirit Smells Like Teen Spirit Smells Like Teen Spirit" />
 
-            <androidx.constraintlayout.helper.widget.Flow
-                android:id="@+id/flowUnderDescriptionPL"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/eight_dp"
-                app:constraint_referenced_ids="durationPL,point,countPL"
-                app:flow_firstHorizontalBias="0"
-                app:flow_firstHorizontalStyle="packed"
-                app:layout_constraintBottom_toTopOf="@+id/sharePL"
-                app:layout_constraintEnd_toStartOf="@id/rightGid"
-                app:layout_constraintStart_toStartOf="@+id/leftGid"
-                app:layout_constraintTop_toBottomOf="@id/descriptionPL" />
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flowUnderDescriptionPL"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/eight_dp"
+            app:constraint_referenced_ids="durationPL,point,countPL"
+            app:flow_firstHorizontalBias="0"
+            app:flow_firstHorizontalStyle="packed"
+            app:layout_constraintBottom_toTopOf="@+id/sharePL"
+            app:layout_constraintEnd_toStartOf="@id/rightGid"
+            app:layout_constraintStart_toStartOf="@+id/leftGid"
+            app:layout_constraintTop_toBottomOf="@id/descriptionPL" />
 
-            <TextView
-                android:id="@+id/durationPL"
-                style="@style/UnderDescriptionPL"
-                android:ellipsize="marquee"
-                android:maxLines="1"
-                tools:text="30000000000000минут" />
+        <TextView
+            android:id="@+id/durationPL"
+            style="@style/UnderDescriptionPL"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            tools:text="30000000000000минут" />
 
-            <TextView
-                android:id="@+id/point"
-                style="@style/UnderDescriptionPL"
-                android:drawableStart="@drawable/ic_point"
-                android:drawableTint="@color/day_dark_and_night_white" />
+        <TextView
+            android:id="@+id/point"
+            style="@style/UnderDescriptionPL"
+            android:drawableStart="@drawable/ic_point"
+            android:drawableTint="@color/dark_color" />
 
-            <TextView
-                android:id="@+id/countPL"
-                style="@style/UnderDescriptionPL"
-                android:ellipsize="marquee"
-                android:maxLines="1"
-                tools:text="123405123532223треков" />
+        <TextView
+            android:id="@+id/countPL"
+            style="@style/UnderDescriptionPL"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            tools:text="123405123532223треков" />
 
-            <ImageView
-                android:id="@+id/sharePL"
-                android:layout_width="@dimen/twenty_four_dp"
-                android:layout_height="@dimen/twenty_four_dp"
-                android:layout_marginTop="@dimen/sixteen_dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_share"
-                app:layout_constraintStart_toEndOf="@id/leftGid"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/flowUnderDescriptionPL"
-                app:tint="@color/black" />
+        <ImageView
+            android:id="@+id/sharePL"
+            android:layout_width="@dimen/twenty_four_dp"
+            android:layout_height="@dimen/twenty_four_dp"
+            android:layout_marginTop="@dimen/sixteen_dp"
+            android:contentDescription="@null"
+            android:layout_marginBottom="@dimen/two_nineteen_dp"
+            android:src="@drawable/ic_share"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/leftGid"
+            app:layout_constraintTop_toBottomOf="@id/flowUnderDescriptionPL"
+            app:tint="@color/black" />
 
-            <ImageView
-                android:id="@+id/morePL"
-                android:layout_width="@dimen/twenty_four_dp"
-                android:layout_height="@dimen/twenty_four_dp"
-                android:layout_marginStart="@dimen/twenty_four_dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_more"
-                app:layout_constraintBottom_toBottomOf="@id/sharePL"
-                app:layout_constraintStart_toEndOf="@id/sharePL"
-                app:layout_constraintTop_toTopOf="@id/sharePL" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+        <ImageView
+            android:id="@+id/morePL"
+            android:layout_width="@dimen/twenty_four_dp"
+            android:layout_height="@dimen/twenty_four_dp"
+            android:layout_marginStart="@dimen/twenty_four_dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_more"
+            app:layout_constraintBottom_toBottomOf="@id/sharePL"
+            app:layout_constraintStart_toEndOf="@id/sharePL"
+            app:layout_constraintTop_toTopOf="@id/sharePL" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomSheetPL"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:behavior_peekHeight="@dimen/one_hundred_forty_dp"
         android:background="@drawable/shape_corner_edit_rectangle"
-        android:elevation="@dimen/sixteen_dp"
         app:behavior_hideable="false"
+        app:behavior_peekHeight="@dimen/two_sixty_six_dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
@@ -199,7 +196,7 @@
         android:layout_height="400dp"
         android:background="@drawable/shape_corner_edit_rectangle"
         android:paddingHorizontal="@dimen/sixteen_dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:behavior_hideable="true"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
@@ -212,7 +209,7 @@
             android:src="@drawable/shape_line_bs"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <include
             android:id="@+id/small_playlist_card"
@@ -228,12 +225,12 @@
             android:id="@+id/tv_share"
             android:layout_width="0dp"
             android:layout_height="64dp"
-            android:gravity="center_vertical"
             android:fontFamily="@font/ys_display_regular"
-            android:textColor="@color/day_dark_and_night_white"
-            android:textSize="@dimen/sixteen_sp"
-            android:textFontWeight="400"
+            android:gravity="center_vertical"
             android:text="@string/share"
+            android:textColor="@color/day_dark_and_night_white"
+            android:textFontWeight="400"
+            android:textSize="@dimen/sixteen_sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/small_playlist_card" />
@@ -242,12 +239,12 @@
             android:id="@+id/tv_edit"
             android:layout_width="0dp"
             android:layout_height="64dp"
-            android:gravity="center_vertical"
             android:fontFamily="@font/ys_display_regular"
-            android:textSize="@dimen/sixteen_sp"
-            android:textFontWeight="400"
-            android:textColor="@color/day_dark_and_night_white"
+            android:gravity="center_vertical"
             android:text="@string/edit_playlist"
+            android:textColor="@color/day_dark_and_night_white"
+            android:textFontWeight="400"
+            android:textSize="@dimen/sixteen_sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_share" />
@@ -256,12 +253,12 @@
             android:id="@+id/deletePlaylist"
             android:layout_width="0dp"
             android:layout_height="64dp"
-            android:gravity="center_vertical"
             android:fontFamily="@font/ys_display_regular"
-            android:textColor="@color/day_dark_and_night_white"
-            android:textSize="@dimen/sixteen_sp"
-            android:textFontWeight="400"
+            android:gravity="center_vertical"
             android:text="@string/delete_playlist"
+            android:textColor="@color/day_dark_and_night_white"
+            android:textFontWeight="400"
+            android:textSize="@dimen/sixteen_sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_edit" />

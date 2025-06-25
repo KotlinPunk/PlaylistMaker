@@ -27,7 +27,7 @@ class PlaylistFragment : Fragment() {
     private val viewModel by viewModel<PlaylistFragmentViewModel>()
     private var adapter: PlaylistAdapter? = null
     private val playlists = ArrayList<Playlist>()
-    private var job: Job? = null
+    private var jobDebounce: Job? = null
 
 
     override fun onCreateView(
@@ -103,8 +103,8 @@ class PlaylistFragment : Fragment() {
     }
 
     private fun clickDebounce() {
-        job?.cancel()
-        job = viewLifecycleOwner.lifecycleScope.launch {
+        jobDebounce?.cancel()
+        jobDebounce = viewLifecycleOwner.lifecycleScope.launch {
             delay(CLICK_DEBOUNCE_DELAY)
         }
     }

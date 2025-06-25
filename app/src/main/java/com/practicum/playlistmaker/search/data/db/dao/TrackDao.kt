@@ -30,7 +30,7 @@ interface TrackDao {
     @Query("SELECT trackIds FROM playlist_table WHERE playlistName = :playlistName")
     fun getTrackIdsForPlaylist(playlistName: String): Flow<String?>
 
-    @Query("SELECT * FROM playlist_tracks_table WHERE trackId IN (:trackIds)")
+    @Query("SELECT * FROM playlist_tracks_table WHERE trackId IN (:trackIds) ORDER BY lastAdded DESC")
     fun getTracksByIds(trackIds: List<Long>): Flow<List<PlaylistAndTracksEntity>>
 
    /* @Query("SELECT EXISTS(SELECT 1 FROM playlist_tracks_table WHERE trackId = :trackId)") // интересует только лишь наличие хотя бы одной строки

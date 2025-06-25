@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -39,7 +40,7 @@ class InfoOfPlaylistsFragment : Fragment() {
     private val trackListFavorite = ArrayList<Track>()
     private lateinit var itemBinding: PlaylistMiniItemBinding
     private lateinit var playlistElement: Playlist
-    private var job: Job? = null
+    private var jobDebounce: Job? = null
 
     private val viewModel by viewModel<InfoOfPlaylistsViewModel>()
 
@@ -61,7 +62,7 @@ class InfoOfPlaylistsFragment : Fragment() {
         viewModel.fillTrackData(playlistId)
         viewModel.subscribeToPlaylistChanges()
 
-         setBottomSheetBehavior(isVisible = false)
+        setBottomSheetBehavior(isVisible = false)
 
         itemBinding =
             PlaylistMiniItemBinding.bind(binding.root.findViewById(R.id.small_playlist_card))
@@ -124,10 +125,9 @@ class InfoOfPlaylistsFragment : Fragment() {
     }
 
     private fun shareApp() {
+        setBottomSheetBehavior(false)
         if (trackListFavorite.isEmpty()) {
-            MaterialAlertDialogBuilder(requireContext())
-                .setMessage(getString(R.string.empty_list))
-                .setPositiveButton("OK", null)
+            Toast.makeText(requireActivity(), getString(R.string.empty_list), Toast.LENGTH_SHORT)
                 .show()
         } else {
             val shareMessage = buildShareMessage(playlistElement, trackListFavorite)
@@ -227,10 +227,10 @@ class InfoOfPlaylistsFragment : Fragment() {
                 )
                 val bundle = Bundle().apply {
                     putLong(PLAYLIST_ID, playlistElement.playlistId ?: -1)
-                    putString("playlist_name", playlistElement.playlistName)
-                    putString("playlist_description", playlistElement.playlistDescription)
-                    putString("playlist_cover_path", playlistElement.playlistCoverPath)
-                    putBoolean("is_editing", true)
+                    putString(PL_NAME, playlistElement.playlistName)
+                    putString(PL_DESC, playlistElement.playlistDescription)
+                    putString(PL_COVER_PATH, playlistElement.playlistCoverPath)
+                    putBoolean(PL_EDIT, true)
                 }
                 findNavController().navigate(
                     R.id.action_infoOfPlaylistsFragment_to_newPlaylistFragment,
@@ -266,7 +266,7 @@ class InfoOfPlaylistsFragment : Fragment() {
             "dialogDeletePlaylist called for: ${playlist.playlistName}"
         )
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.do_you_want_delete_pl) +" \"${playlist.playlistName}\"?")
+            .setTitle(getString(R.string.do_you_want_delete_pl) + " \"${playlist.playlistName}\"?")
             .setNegativeButton(requireActivity().getString(R.string.nope)) { _, _ ->
                 Log.d("InfoOfPlaylistsFragment", "Delete cancelled")
             }.setPositiveButton(requireActivity().getString(R.string.yep)) { _, _ ->
@@ -358,8 +358,8 @@ class InfoOfPlaylistsFragment : Fragment() {
     }
 
     private fun clickDebounce() {
-        job?.cancel()
-        job = viewLifecycleOwner.lifecycleScope.launch {
+        jobDebounce?.cancel()
+        jobDebounce = viewLifecycleOwner.lifecycleScope.launch {
             delay(CLICK_DEBOUNCE_DELAY)
         }
     }
@@ -373,6 +373,10 @@ class InfoOfPlaylistsFragment : Fragment() {
         private const val PLAYLIST_ID = "playlist_id"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val TRACK_DATA = "track_data"
+        private const val PL_NAME = "playlist_name"
+        private const val PL_DESC = "playlist_description"
+        private const val PL_COVER_PATH = "playlist_cover_path"
+        private const val PL_EDIT = "is_editing"
     }
 
 }

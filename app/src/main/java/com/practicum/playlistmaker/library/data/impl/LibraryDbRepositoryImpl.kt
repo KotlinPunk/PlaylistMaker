@@ -1,8 +1,6 @@
 package com.practicum.playlistmaker.library.data.impl
 
-import android.util.Log
 import com.practicum.playlistmaker.library.domain.api.repo.LibraryDbRepository
-import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.search.data.TrackDbConvertor
 import com.practicum.playlistmaker.search.data.db.AppDatabase
 import com.practicum.playlistmaker.search.data.db.entity.TrackEntity

@@ -39,6 +39,7 @@
     <string name="cancel">Отмена</string>
     <string name="nope">Нет</string>
     <string name="yep">Да</string>
+    <string name="Ok">Ок</string>
     <string name="playlist_created_success">Плейлист %1$s успешно создан</string>
     <string name="added_to_playlist">Добавлено в плейлист %s</string>
     <string name="present_in_playlist">Трек уже добавлен в плейлист %s</string>

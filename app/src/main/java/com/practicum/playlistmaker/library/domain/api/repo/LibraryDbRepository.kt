@@ -1,7 +1,5 @@
 package com.practicum.playlistmaker.library.domain.api.repo
 
-import com.practicum.playlistmaker.library.domain.models.Playlist
-import com.practicum.playlistmaker.search.data.db.entity.PlaylistAndTracksEntity
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 

@@ -16,4 +16,7 @@ interface PlaylistAndTracksDao {
     @Delete(entity = PlaylistAndTracksEntity::class)
     suspend fun deleteTrackFromAnyPlaylist(track: PlaylistAndTracksEntity)
 
+    @Query("SELECT * FROM playlist_tracks_table")
+    fun getTracksInPlaylists(): List<PlaylistAndTracksEntity>
+
 }
