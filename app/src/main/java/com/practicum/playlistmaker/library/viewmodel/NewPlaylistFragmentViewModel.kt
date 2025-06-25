@@ -30,7 +30,7 @@ open class NewPlaylistFragmentViewModel(private val playlistInteractor: Playlist
         description: String,
         coverPath: String?
     ) {
-        android.util.Log.d(
+        Log.d(
             "NewPlaylistFragmentViewModel",
             "loadPlaylistForEditing: id=$playlistId, name=$name, description=$description"
         )
@@ -74,11 +74,11 @@ open class NewPlaylistFragmentViewModel(private val playlistInteractor: Playlist
                 ?: return@launch // проверка состояния, если null, то сразу выходим из корутины
             try {
                 if (isEditing) {
-                    android.util.Log.d(
+                    Log.d(
                         "NewPlaylistFragmentViewModel",
                         "Updating existing playlist: id=$editingPlaylistId"
                     )
-                    android.util.Log.d(
+                    Log.d(
                         "NewPlaylistFragmentViewModel",
                         "New data: name='${currentState.namePL}', description='${currentState.descriptionPL}', coverPath='${currentState.coverPathPL}'"
                     )

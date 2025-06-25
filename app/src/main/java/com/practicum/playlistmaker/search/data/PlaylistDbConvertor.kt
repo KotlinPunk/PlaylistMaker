@@ -7,15 +7,15 @@ import com.practicum.playlistmaker.search.domain.models.Track
 
 class PlaylistDbConvertor {
 
-    fun mapToPlaylistEntity(playlist: Playlist): PlaylistEntity {
+    fun mapToPlaylistEntity(playlist: Playlist?): PlaylistEntity {
         return PlaylistEntity(
-            playlist.playlistId ?: 0,
-            playlist.playlistName,
-            playlist.playlistDescription,
-            playlist.playlistCoverPath,
-            playlist.trackIds ?: "[]",
-            playlist.trackCount ?: 0,
-            playlist.totalDuration ?: 0
+            playlist?.playlistId ?: 0,
+            playlist?.playlistName ?: "",
+            playlist?.playlistDescription ?: "",
+            playlist?.playlistCoverPath,
+            playlist?.trackIds ?: "[]",
+            playlist?.trackCount ?: 0,
+            playlist?.totalDuration ?: 0
         )
     }
 

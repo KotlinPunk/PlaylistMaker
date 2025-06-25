@@ -34,8 +34,8 @@ class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository)
         playlistRepository.deleteTrackFromAnyListRepo(track, playlist)
     }
 
-    override suspend fun deletePlaylistIntr(playlistId: Long?) {
-        playlistRepository.deletePlaylistRepo(playlistId)
+    override suspend fun deletePlaylistIntr(playlist: Playlist) {
+        playlistRepository.deletePlaylistRepo(playlist)
     }
 
     override suspend fun editPlaylistIntr(
@@ -50,5 +50,12 @@ class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository)
             descriptionPl,
             imagePl
         )
+    }
+
+    override suspend fun removeTrackFromPlaylistIntr(
+        trackId: Long,
+        playlist: Playlist?
+    ) {
+        playlistRepository.removeTrackFromPlaylistRepo(trackId, playlist)
     }
 }

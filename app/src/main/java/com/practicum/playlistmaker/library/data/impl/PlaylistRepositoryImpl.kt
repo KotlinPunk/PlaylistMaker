@@ -5,11 +5,13 @@ import com.google.gson.Gson
 import com.practicum.playlistmaker.library.domain.api.repo.PlaylistRepository
 import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.search.data.PlaylistDbConvertor
+import com.practicum.playlistmaker.search.data.TrackDbConvertor
 import com.practicum.playlistmaker.search.data.db.AppDatabase
 import com.practicum.playlistmaker.search.data.db.entity.PlaylistAndTracksEntity
 import com.practicum.playlistmaker.search.data.db.entity.PlaylistEntity
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class PlaylistRepositoryImpl(
@@ -83,7 +85,6 @@ class PlaylistRepositoryImpl(
                 "Track ID ${track.trackId} not found in playlist ${playlist.playlistId}"
             )
         }
-
         // Обновляем количество треков
         val updateTrackCount = trackIds.size
         // Преобразуем обновленный список ID треков обратно в JSON строку
@@ -95,7 +96,6 @@ class PlaylistRepositoryImpl(
             Log.e("PlaylistRepository", "Playlist ID is null. Cannot update playlist.")
             return
         }
-
         appDatabase.playlistDao().updateTracksList(
             updateTracksIds = updateTrackIdsJson,
             updateTrackCount = updateTrackCount,
@@ -106,20 +106,6 @@ class PlaylistRepositoryImpl(
             checkTrackInPlaylists(track, it)
         }
     }
-
-    override suspend fun deletePlaylistRepo(playlistId: Long?) {
-        appDatabase.playlistDao().deletePlaylist(playlistId)
-    }
-
-    override suspend fun editPlaylistRepo(
-        idPl: Long?,
-        namePl: String,
-        descriptionPl: String,
-        imagePl: String?
-    ) {
-        appDatabase.playlistDao().editPlaylist(idPl, namePl, descriptionPl, imagePl)
-    }
-
 
     private suspend fun checkTrackInPlaylists(track: Track, playlists: List<Playlist>) {
         var check = 0
@@ -133,6 +119,68 @@ class PlaylistRepositoryImpl(
             val chosenTrackEntity = playlistDbConvertor.mapToPlaylistAndTracks(track)
             appDatabase.playlistAndTracksDao().deleteTrackFromAnyPlaylist(chosenTrackEntity)
         }
+    }
+
+
+    override suspend fun deletePlaylistRepo(playlist: Playlist) {
+        val trackIds = playlist.trackIds?.fromJson(gson)?.toList() ?: emptyList()
+
+        appDatabase.playlistDao().deletePlaylist(playlistDbConvertor.mapToPlaylistEntity(playlist))
+
+        // Удаляем треки из playlist_tracks_table, только если они не используются в других плейлистах
+        trackIds.forEach { trackId ->
+            val track = appDatabase.playlistDao().getTrackById(trackId)
+
+            if (track != null) {
+                // Проверяем, используется ли трек в других плейлистах
+                val inOtherPlaylists = appDatabase.playlistDao().getAllPlaylists().first()
+                    .any { otherPlaylist ->
+                        otherPlaylist.trackIds?.fromJson(gson)?.contains(trackId) == true && otherPlaylist.playlistId != playlist.playlistId
+                    }
+
+                if (!inOtherPlaylists) {
+                    // Если трек не используется в других плейлистах, удаляем его
+                    appDatabase.playlistAndTracksDao().deleteTrackFromAnyPlaylist(track)
+                }
+            }
+        }
+    }
+
+
+    override suspend fun editPlaylistRepo(
+        idPl: Long?,
+        namePl: String,
+        descriptionPl: String,
+        imagePl: String?
+    ) {
+        appDatabase.playlistDao().editPlaylist(idPl, namePl, descriptionPl, imagePl)
+    }
+
+    override suspend fun removeTrackFromPlaylistRepo(
+        trackId: Long,
+        playlist: Playlist?
+    ) {
+        val convertPlaylist = playlistDbConvertor.mapToPlaylistEntity(playlist)
+
+        // 1. Получить текущий список trackIds из playlist.trackIds
+        val trackIds = convertPlaylist.trackIds?.fromJson(gson)?.toMutableList() ?: mutableListOf()
+
+        // 2. Удалить trackId из списка
+        trackIds.remove(trackId)
+
+        // 3. Обновить trackCount
+        val newTrackCount = trackIds.size
+
+        // 4. Преобразовать обновленный список trackIds обратно в JSON
+        val updatedTrackIdsJson = trackIds.toJson(gson)
+
+        // 5. Обновить PlaylistEntity в базе данных
+        val updatedPlaylist = convertPlaylist.copy(
+            trackIds = updatedTrackIdsJson,
+            trackCount = newTrackCount
+        )
+
+        appDatabase.playlistDao().updatePlaylist(updatedPlaylist)
     }
 
 

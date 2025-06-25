@@ -87,7 +87,12 @@ class InfoOfPlaylistsFragment : Fragment() {
                 }
                 .setPositiveButton(getString(R.string.yep)) { dialog, _ ->
                     dialog.dismiss()
-                    viewModel.deleteTrackToPlaylist(track, playlistId)
+                    viewModel.playlistInfo.observe(viewLifecycleOwner) { state ->
+                        when (state) {
+                            is InfoOfPlaylistState.Content -> viewModel.removeTrackFromPlaylist(track.trackId, state.playlist)
+                            is InfoOfPlaylistState.Error -> TODO()
+                        }
+                    }
                 }
                 .show()
         }
@@ -125,10 +130,9 @@ class InfoOfPlaylistsFragment : Fragment() {
     }
 
     private fun shareApp() {
-        setBottomSheetBehavior(false)
         if (trackListFavorite.isEmpty()) {
-            Toast.makeText(requireActivity(), getString(R.string.empty_list), Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(requireActivity(), getString(R.string.empty_list), Toast.LENGTH_SHORT).show()
+            setBottomSheetBehavior(false)
         } else {
             val shareMessage = buildShareMessage(playlistElement, trackListFavorite)
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -266,7 +270,7 @@ class InfoOfPlaylistsFragment : Fragment() {
             "dialogDeletePlaylist called for: ${playlist.playlistName}"
         )
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.do_you_want_delete_pl) + " \"${playlist.playlistName}\"?")
+            .setTitle(getString(R.string.do_you_want_delete_pl) +" \"${playlist.playlistName}\"?")
             .setNegativeButton(requireActivity().getString(R.string.nope)) { _, _ ->
                 Log.d("InfoOfPlaylistsFragment", "Delete cancelled")
             }.setPositiveButton(requireActivity().getString(R.string.yep)) { _, _ ->
@@ -274,7 +278,7 @@ class InfoOfPlaylistsFragment : Fragment() {
                     "InfoOfPlaylistsFragment",
                     "Delete confirmed for playlist: ${playlist.playlistName}"
                 )
-                viewModel.deletePlaylist(playlist.playlistId)
+                viewModel.deletePlaylist(playlist)
                 findNavController().navigateUp()
             }.show()
     }

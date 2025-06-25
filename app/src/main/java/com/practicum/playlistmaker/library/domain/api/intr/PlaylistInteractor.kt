@@ -13,6 +13,8 @@ interface PlaylistInteractor {
 
     suspend fun deleteTrackFromAnyListIntr(track: Track, playlist: Playlist?)
 
-    suspend fun deletePlaylistIntr(playlistId: Long?)
+    suspend fun deletePlaylistIntr(playlist: Playlist)
     suspend fun editPlaylistIntr(idPl: Long?, namePl: String, descriptionPl: String, imagePl: String?)
+
+    suspend fun removeTrackFromPlaylistIntr(trackId: Long, playlist: Playlist?)
 }
