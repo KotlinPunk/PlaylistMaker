@@ -12,6 +12,10 @@ class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository)
         return playlistRepository.insertPlaylistRepo(playlist)
     }
 
+    override suspend fun getPlaylistIntr(playlistId: Long?): Playlist? {
+        return playlistRepository.getPlaylistRepo(playlistId)
+    }
+
     override fun getAllPlaylistsIntr(): Flow<List<Playlist>> {
         return playlistRepository.getAllPlaylistsRepo()
     }
@@ -21,5 +25,37 @@ class PlaylistInteractorImpl(private val playlistRepository: PlaylistRepository)
         playlist: Playlist
     ) {
         playlistRepository.addTrackToPlaylistRepo(track, playlist)
+    }
+
+    override suspend fun deleteTrackFromAnyListIntr(
+        track: Track,
+        playlist: Playlist?
+    ) {
+        playlistRepository.deleteTrackFromAnyListRepo(track, playlist)
+    }
+
+    override suspend fun deletePlaylistIntr(playlist: Playlist) {
+        playlistRepository.deletePlaylistRepo(playlist)
+    }
+
+    override suspend fun editPlaylistIntr(
+        idPl: Long?,
+        namePl: String,
+        descriptionPl: String,
+        imagePl: String?
+    ) {
+        playlistRepository.editPlaylistRepo(
+            idPl,
+            namePl,
+            descriptionPl,
+            imagePl
+        )
+    }
+
+    override suspend fun removeTrackFromPlaylistIntr(
+        trackId: Long,
+        playlist: Playlist?
+    ) {
+        playlistRepository.removeTrackFromPlaylistRepo(trackId, playlist)
     }
 }

@@ -9,7 +9,7 @@ import com.practicum.playlistmaker.library.domain.models.Playlist
 class PlaylistAdapter(private var playlists: List<Playlist>) :
     RecyclerView.Adapter<PlaylistHolder>() {
 
-    var onClickTrack: ((Playlist) -> Unit)? = null
+    var onClickPL: ((Playlist) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistHolder {
         val layoutInspector = LayoutInflater.from(parent.context)
@@ -20,7 +20,7 @@ class PlaylistAdapter(private var playlists: List<Playlist>) :
     override fun onBindViewHolder(holder: PlaylistHolder, position: Int) {
         holder.bind(playlists[position])
         holder.itemView.setOnClickListener {
-            onClickTrack?.invoke(playlists[position])
+            onClickPL?.invoke(playlists[position])
         }
     }
 

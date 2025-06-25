@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.library.ui
+package com.practicum.playlistmaker.library.ui.frags
 
 import android.os.Bundle
 import android.util.Log
@@ -8,17 +8,17 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.practicum.playlistmaker.R
 import androidx.navigation.fragment.findNavController
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
 import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.library.domain.models.PlaylistFragmentState
+import com.practicum.playlistmaker.library.ui.PlaylistAdapter
 import com.practicum.playlistmaker.library.viewmodel.PlaylistFragmentViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.String
-import kotlin.collections.List
 
 class PlaylistFragment : Fragment() {
 
@@ -27,7 +27,8 @@ class PlaylistFragment : Fragment() {
     private val viewModel by viewModel<PlaylistFragmentViewModel>()
     private var adapter: PlaylistAdapter? = null
     private val playlists = ArrayList<Playlist>()
-    private var isClickAllowed = true
+    private var jobDebounce: Job? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,6 +61,23 @@ class PlaylistFragment : Fragment() {
                 viewModel.fillData()
             }
         }
+
+
+        adapter?.onClickPL = { playlist: Playlist ->
+            clickDebounce()
+            val playlistId = playlist.playlistId ?: -1L // если playlistId null, присваиваем значение по умолчанию (-1L)
+            if (playlistId != -1L) {
+                val bundle = Bundle().apply {
+                    putLong(PLAYLIST_ID, playlistId)
+                }
+                findNavController().navigate(
+                    R.id.action_mediaLibraryFragment_to_infoOfPlaylistsFragment,
+                    bundle
+                )
+            } else {
+                Log.e("PlaylistAdapter", "playlistId is null for playlist: ${playlist.playlistName}")
+            }
+        }
     }
 
     private fun showPlaylistTracks(favTracks: List<Playlist>) {
@@ -84,16 +102,11 @@ class PlaylistFragment : Fragment() {
         binding.placeholderErrorTextFragment.text = errorMessage
     }
 
-    private fun clickDebounce(): Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            viewLifecycleOwner.lifecycleScope.launch {
-                delay(CLICK_DEBOUNCE_DELAY)
-                isClickAllowed = true
-            }
+    private fun clickDebounce() {
+        jobDebounce?.cancel()
+        jobDebounce = viewLifecycleOwner.lifecycleScope.launch {
+            delay(CLICK_DEBOUNCE_DELAY)
         }
-        return current
     }
 
     override fun onDestroyView() {
@@ -104,5 +117,7 @@ class PlaylistFragment : Fragment() {
     companion object {
         fun newInstance() = PlaylistFragment()
         private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val PLAYLIST_ID = "playlist_id"
+
     }
 }

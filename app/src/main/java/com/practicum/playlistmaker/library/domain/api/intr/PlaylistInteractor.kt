@@ -7,6 +7,14 @@ import kotlinx.coroutines.flow.Flow
 interface PlaylistInteractor {
 
     suspend fun insertPlaylistIntr(playlist: Playlist): Long
+    suspend fun getPlaylistIntr(playlistId: Long?): Playlist?
     fun getAllPlaylistsIntr(): Flow<List<Playlist>>
     suspend fun addTrackToPlaylistIntr(track: Track, playlist: Playlist)
+
+    suspend fun deleteTrackFromAnyListIntr(track: Track, playlist: Playlist?)
+
+    suspend fun deletePlaylistIntr(playlist: Playlist)
+    suspend fun editPlaylistIntr(idPl: Long?, namePl: String, descriptionPl: String, imagePl: String?)
+
+    suspend fun removeTrackFromPlaylistIntr(trackId: Long, playlist: Playlist?)
 }

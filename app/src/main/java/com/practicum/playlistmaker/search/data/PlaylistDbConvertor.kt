@@ -7,14 +7,15 @@ import com.practicum.playlistmaker.search.domain.models.Track
 
 class PlaylistDbConvertor {
 
-    fun mapToPlaylistEntity(playlist: Playlist): PlaylistEntity {
+    fun mapToPlaylistEntity(playlist: Playlist?): PlaylistEntity {
         return PlaylistEntity(
-            playlist.playlistId ?: 0,
-            playlist.playlistName,
-            playlist.playlistDescription,
-            playlist.playlistCoverPath,
-            playlist.trackIds ?: "[]",
-            playlist.trackCount ?: 0
+            playlist?.playlistId ?: 0,
+            playlist?.playlistName ?: "",
+            playlist?.playlistDescription ?: "",
+            playlist?.playlistCoverPath,
+            playlist?.trackIds ?: "[]",
+            playlist?.trackCount ?: 0,
+            playlist?.totalDuration ?: 0
         )
     }
 
@@ -25,7 +26,8 @@ class PlaylistDbConvertor {
             playlistEntity.playlistDescription,
             playlistEntity.playlistCoverPath,
             playlistEntity.trackIds,
-            playlistEntity.trackCount
+            playlistEntity.trackCount,
+            playlistEntity.totalDuration
         )
     }
 
@@ -40,7 +42,24 @@ class PlaylistDbConvertor {
             track.releaseDate,
             track.primaryGenreName,
             track.country,
-            track.previewUrl,
+            track.previewUrl
         )
     }
+
+    fun mapToTrack(playlistAndTracksEntity: PlaylistAndTracksEntity): Track{
+        return Track(
+            playlistAndTracksEntity.trackName,
+            playlistAndTracksEntity.artistName,
+            playlistAndTracksEntity.trackTimeMillis,
+            playlistAndTracksEntity.artworkUrl100,
+            playlistAndTracksEntity.trackId,
+            playlistAndTracksEntity.collectionName,
+            playlistAndTracksEntity.releaseDate,
+            playlistAndTracksEntity.primaryGenreName,
+            playlistAndTracksEntity.country,
+            playlistAndTracksEntity.previewUrl
+        )
+    }
+
+
 }

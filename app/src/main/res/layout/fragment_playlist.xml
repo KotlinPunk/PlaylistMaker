@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.practicum.playlistmaker.library.ui.PlaylistFragment">
+    tools:context="com.practicum.playlistmaker.library.ui.frags.PlaylistFragment">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/startGuideLine2"

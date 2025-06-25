@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/day_white_and_night_dark"
-    tools:context="com.practicum.playlistmaker.library.ui.NewPlaylistFragment">
+    tools:context="com.practicum.playlistmaker.library.ui.frags.NewPlaylistFragment">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/startGuideLine2"

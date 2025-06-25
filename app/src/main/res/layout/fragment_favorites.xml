@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.practicum.playlistmaker.library.ui.FavoriteFragment">
+    tools:context="com.practicum.playlistmaker.library.ui.frags.FavoriteFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFavoriteTrackListXml"

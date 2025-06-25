@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.library.ui
+package com.practicum.playlistmaker.library.ui.frags
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,20 +26,18 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentNewPlaylistBinding
 import com.practicum.playlistmaker.library.viewmodel.NewPlaylistFragmentViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.getValue
-import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.root.RootActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-
 
 class NewPlaylistFragment : Fragment() {
     private var _binding: FragmentNewPlaylistBinding? = null
@@ -54,9 +53,47 @@ class NewPlaylistFragment : Fragment() {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // проверка для режима редактирования
+        val isEditing = arguments?.getBoolean(PL_EDIT, false) ?: false
+        Log.d("NewPlaylistFragment", "isEditing: $isEditing")
+        if (isEditing) {
+            // переносим данные для редакции
+            val playlistId = arguments?.getLong(PLAYLIST_ID, -1)
+            val playlistName = arguments?.getString(PL_NAME, "")
+            val playlistDescription = arguments?.getString(PL_DESC, "")
+            val playlistCoverPath = arguments?.getString(PL_COVER_PATH, "")
+            Log.d(
+                "NewPlaylistFragment",
+                "Editing playlist: id=$playlistId, name=$playlistName, description=$playlistDescription"
+            )
+
+            viewModel.loadPlaylistForEditing(
+                playlistId,
+                playlistName ?: "",
+                playlistDescription ?: "",
+                playlistCoverPath
+            )
+            // обновляем UI в режиме редактирования
+            binding.toolbarNewPL.title = getString(R.string.edit_playlist)
+            binding.newPlaylistButton.text = getString(R.string.save)
+            // подгружаем картинку
+            if (!playlistCoverPath.isNullOrEmpty()) {
+                Glide.with(requireContext())
+                    .load(playlistCoverPath)
+                    .transform(CenterCrop())
+                    .placeholder(R.drawable.ic_placeholder_312_x_312)
+                    .into(binding.imageNewPL)
+            }
+        } else {
+            // иначе создаём новый плейлист
+            binding.toolbarNewPL.title = getString(R.string.new_playlist)
+            binding.newPlaylistButton.text = getString(R.string.create)
+        }
+
+
 
         viewModel.stateLiveData.observe(viewLifecycleOwner) { state ->
             // обновили ui в зависимости от состояния
@@ -66,7 +103,7 @@ class NewPlaylistFragment : Fragment() {
             if (binding.inputDescriptionNewPL.text.toString() != state.descriptionPL) {
                 binding.inputDescriptionNewPL.setText(state.descriptionPL)
             }
-            // меняем состояние кнопки "Создать"
+            // меняем состояние кнопки "Создать" или "Сохранить"
             val color = if (state.isSaveButtinEnabled) {
                 ContextCompat.getColor(requireContext(), R.color.blue)
             } else {
@@ -94,7 +131,11 @@ class NewPlaylistFragment : Fragment() {
         binding.newPlaylistButton.setOnClickListener {
             viewModel.savePlaylist()
             var playlistName = binding.inputNameNewPL.text.toString()
-            setSnackbar(getString(R.string.playlist_created_success, playlistName))
+            if (viewModel.isEditingMode()) {
+                setSnackbar(getString(R.string.playlist_updated_success, playlistName))
+            } else {
+                setSnackbar(getString(R.string.playlist_created_success, playlistName))
+            }
             toBack()
         }
 
@@ -122,7 +163,8 @@ class NewPlaylistFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(  // привязка к жизненному циклу фрагмента, предотвращение утечек памяти, гарантия не активности
             viewLifecycleOwner,                                 // колбека, когда нет фрагмента
-            object : OnBackPressedCallback(true) {              // получение состояние лайвдаты единожды, т.е. считывается раз, когда колбек зареган
+            object :
+                OnBackPressedCallback(true) {              // получение состояние лайвдаты единожды, т.е. считывается раз, когда колбек зареган
                 override fun handleOnBackPressed() {            // колбек не реагирует на изменения лайвдаты, поэтому менее реактивный (прошлая версия была противоложна по действию)
                     val state = viewModel.stateLiveData.value
                     if (state != null && (state.namePL.isNotEmpty() || state.descriptionPL.isNotEmpty() || state.coverPathPL.isNotEmpty())) {
@@ -138,7 +180,7 @@ class NewPlaylistFragment : Fragment() {
         }
     }
 
-    private fun saveImageToPrivateStorage(imageUri: Uri) {
+    private fun saveImageToPrivateStorage(imageUri: Uri) { // надо будет вынести во вьюМодел
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 val inputStream: InputStream? =
@@ -234,10 +276,15 @@ class NewPlaylistFragment : Fragment() {
                 )
             )
         )
-
         snackbarView.addView(snackbarLayout, 0)
         snackbar.show()
     }
+
+    companion object {
+        private const val PLAYLIST_ID = "playlist_id"
+        private const val PL_NAME = "playlist_name"
+        private const val PL_DESC = "playlist_description"
+        private const val PL_COVER_PATH = "playlist_cover_path"
+        private const val PL_EDIT = "is_editing"
+    }
 }
-
-

@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.library.domain.impl
 
+import android.util.Log
 import com.practicum.playlistmaker.library.domain.api.intr.LibraryDbInteractor
 import com.practicum.playlistmaker.library.domain.api.repo.LibraryDbRepository
 import com.practicum.playlistmaker.search.domain.models.Track
@@ -23,4 +24,14 @@ class LibraryDbInteractorImpl(private val libraryDbRepository: LibraryDbReposito
     override suspend fun isTrackInFavorites(trackId: Long): Boolean {
         return libraryDbRepository.isTrackInFavorites(trackId)
     }
+
+    override suspend fun getPlaylistTotalDurationIntr(playlistName: String): Flow<Long?> {
+        Log.d("LibraryDbInteractor", "getPlaylistTotalDurationIntr called with playlistName: $playlistName")
+        return libraryDbRepository.getPlaylistTotalDurationRepo(playlistName)
+    }
+
+    override suspend fun getTrackInPlaylistIntr(playlistName: String): Flow<List<Track>> {
+        return libraryDbRepository.getTrackInPlaylistRepo(playlistName)
+    }
+
 }

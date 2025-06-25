@@ -7,6 +7,7 @@ import com.practicum.playlistmaker.search.data.db.entity.TrackEntity
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlin.text.isNullOrEmpty
 
 class LibraryDbRepositoryImpl(
     private val appDatabase: AppDatabase,
@@ -32,6 +33,63 @@ class LibraryDbRepositoryImpl(
         val isInFavorites = appDatabase.trackDao().isTrackInFavorites(trackId)
         return isInFavorites
     }
+
+    override suspend fun getPlaylistTotalDurationRepo(playlistName: String): Flow<Long?> = flow {
+        appDatabase.trackDao().getTrackIdsForPlaylist(playlistName).collect { trackIdsString ->
+            if (trackIdsString.isNullOrEmpty()) {
+                emit(0L)                                            // плейлист пуст или его нет
+            } else {
+                val trackIds = trackIdsString.removeSurrounding(    // убираем префиксы и суффиксы, а именно [ и ]
+                    "[",
+                    "]"
+                )
+                    .split(",")                         // разделяем строку
+                    .mapNotNull {
+                        it.trim().toLongOrNull()        // убираем пробелы на всякий случай в начале и конце строки,
+                    }                                   // приводим к Long, а дальше фильтруем на null
+                if (trackIds.isEmpty()) {
+                    emit(0L)
+                } else {
+                    appDatabase.trackDao().getTracksByIds(trackIds).collect { tracks ->
+                        val totalDuration = tracks.sumOf { it.trackTimeMillis }
+                        emit(totalDuration)
+                    }
+                }
+            }
+        }
+    }
+
+    override suspend fun getTrackInPlaylistRepo(playlistName: String): Flow<List<Track>> = flow {
+        try {
+
+            appDatabase.trackDao().getTrackIdsForPlaylist(playlistName).collect { trackIdsString ->
+
+                if (trackIdsString.isNullOrEmpty()) {
+                    emit(emptyList())
+                    return@collect
+                }
+
+                val trackIds = trackIdsString.removeSurrounding("[", "]")
+                    .split(",")
+                    .mapNotNull { it.trim().toLongOrNull() }
+
+                if (trackIds.isEmpty()) {
+                    emit(emptyList())
+                    return@collect
+                }
+
+                appDatabase.trackDao().getTracksByIds(trackIds).collect { trackEntities ->
+                    val tracks = trackEntities.map { trackDbConvertor.mapFromPlaylistAndTracksToTrack(it) }
+                    emit(tracks)
+                }
+            }
+
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
+    }
+
+
 
     private fun trackToTrackEntity(track: Track): TrackEntity {
         return trackDbConvertor.mapToTrackEntity(track)

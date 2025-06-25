@@ -251,7 +251,7 @@
         android:id="@+id/bottomSheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/day_white_and_night_dark"
+        android:background="@drawable/shape_corner_edit_rectangle"
         android:elevation="@dimen/sixteen_dp"
         android:visibility="gone"
         app:behavior_hideable="true"

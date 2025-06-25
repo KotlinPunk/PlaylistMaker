@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/day_white_and_night_dark"
     android:orientation="vertical"
-    tools:context="com.practicum.playlistmaker.library.ui.MediaLibraryFragment">
+    tools:context="com.practicum.playlistmaker.library.ui.frags.MediaLibraryFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
