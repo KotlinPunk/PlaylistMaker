@@ -13,9 +13,11 @@ import com.practicum.playlistmaker.library.domain.models.InfoOfPlaylistState
 import com.practicum.playlistmaker.library.domain.models.Playlist
 import com.practicum.playlistmaker.player.domain.models.PlaylistStateInPlayer
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class InfoOfPlaylistsViewModel(
     private val playlistInteractor: PlaylistInteractor,
@@ -58,14 +60,14 @@ class InfoOfPlaylistsViewModel(
         }
     }
 
-    fun removeTrackFromPlaylist(trackId: Long, playlist: Playlist?) {
+    /*fun removeTrackFromPlaylist(trackId: Long, playlist: Playlist?) {
         viewModelScope.launch {
             playlistInteractor.removeTrackFromPlaylistIntr(trackId, playlist)
         }
-    }
+    }*/
 
 
-/*    fun deleteTrackToPlaylist(track: Track, playlistId: Long?) {
+    fun deleteTrackToPlaylist(track: Track, playlistId: Long?) {
 
         viewModelScope.launch {
             var playlist = playlistInteractor.getPlaylistIntr(playlistId)
@@ -91,7 +93,7 @@ class InfoOfPlaylistsViewModel(
                 )
             }
         }
-    }*/
+    }
 
     private fun String?.fromJson(gson: Gson): List<Long> =
         this?.let { gson.fromJson(it, Array<Long>::class.java)?.toList() } ?: emptyList()

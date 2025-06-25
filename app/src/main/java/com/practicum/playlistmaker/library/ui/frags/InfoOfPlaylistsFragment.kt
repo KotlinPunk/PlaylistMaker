@@ -88,10 +88,7 @@ class InfoOfPlaylistsFragment : Fragment() {
                 .setPositiveButton(getString(R.string.yep)) { dialog, _ ->
                     dialog.dismiss()
                     viewModel.playlistInfo.observe(viewLifecycleOwner) { state ->
-                        when (state) {
-                            is InfoOfPlaylistState.Content -> viewModel.removeTrackFromPlaylist(track.trackId, state.playlist)
-                            is InfoOfPlaylistState.Error -> TODO()
-                        }
+                        viewModel.deleteTrackToPlaylist(track, playlistId)
                     }
                 }
                 .show()
